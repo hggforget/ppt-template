@@ -1,0 +1,117 @@
+\section*{Appendices}
+\vspace{1.6ex}
+\titlecontents{psection}[2.3em]{}{\contentslabel{2.3em}}{}{\titlerule*[1pc]{.}\contentspage}
+\startcontents[sections]
+\printcontents[sections]{p}{1}{\setcounter{tocdepth}{2}}
+\clearpage
+
+\section{Benchmark Overview}
+\input{tables/benchmarks}
+\section{Model Sizes}
+\input{tables/models}
+\clearpage
+
+\input{sections/diff}
+\clearpage
+
+\newgeometry{top=2cm,bottom=1.8cm,left=2.5cm,right=2.5cm}
+\section{Ablation Curves}
+\input{figures/ablations/figure}
+\restoregeometry
+\clearpage
+\input{sections/ablexpl}
+\clearpage
+
+\input{sections/mcenv}
+\clearpage
+
+\section{Minecraft Item Rates}
+
+Across 40 seeds trained for 100M steps, DreamerV3 obtained the maximum episode score---that includes collecting at least one diamond---50 times. It achieves this score the first time at 29.3M steps and as expected the frequency increases over time. Diamonds can also rarely be found by breaking village chests, but those episodes do not achieve the maximum score and thus are not included in this statistic.
+A total of 24 out of 40 seeds achieve the maximum episode score at least once, and the most successful seed achieved the maximum score 6 times. Across all seeds, the median number of environment steps until collecting the first diamond is 74M, corresponding to 42 days of play time at 20 Hz.
+
+\input{figures/mcitems/figure}
+\clearpage
+
+\newgeometry{top=2cm,bottom=2cm,left=3cm,right=3cm}
+\section{Minecraft Video Predictions}
+\label{sec:openl}
+\input{figures/openl/more}
+\restoregeometry
+\clearpage
+
+\newgeometry{top=1.5cm,bottom=1.5cm,left=2.5cm,right=2.5cm}
+\section{DMLab Curves}
+\vspace*{-1ex}
+\input{figures/dmlab/figure}
+\vspace*{-2ex}
+\section{DMLab Scores}
+\vspace*{-2ex}
+\input{tables/dmlab}
+\restoregeometry
+\clearpage
+
+\section{DMLab Data Efficiency}
+\label{sec:dmlab_eff}
+\input{figures/dmlab_eff/figure}
+\input{tables/dmlab_eff}
+\clearpage
+
+\section{BSuite Scores}
+\vspace{-2ex}
+\input{figures/bsuite/figure}
+\vspace{-2ex}
+\input{tables/bsuite}
+\clearpage
+
+\newgeometry{top=1.5cm,bottom=1.8cm,left=2.5cm,right=2.5cm}
+\section{Crafter Scores}
+\input{figures/crafter/figure}
+\input{tables/crafter}
+\restoregeometry
+\clearpage
+
+\section{Proprioceptive Control Curves}
+\input{figures/dmc_proprio/figure}
+\clearpage
+\section{Proprioceptive Control Scores}
+\input{tables/dmc_proprio}
+\clearpage
+
+\newgeometry{top=1.5cm,bottom=1cm,left=2.3cm,right=2.3cm}
+\thispagestyle{blank}
+\section{Visual Control Curves}
+\input{figures/dmc_vision/figure}
+\restoregeometry
+\clearpage
+\section{Visual Control Scores}
+\input{tables/dmc_vision}
+\clearpage
+
+\section{Atari 100K Curves}
+\input{figures/atari100k/figure}
+\clearpage
+
+\section{Atari 100K Scores}
+\input{tables/atari100k}
+\clearpage
+
+\section{Atari 100K Settings}
+\input{tables/atari100k_setting}
+\clearpage
+
+\newgeometry{top=1cm,bottom=1cm,left=2.3cm,right=2.3cm}
+\thispagestyle{blank}
+\section{Atari 200M Curves}
+\vspace{-2ex}
+\input{figures/atari/figure}
+\clearpage
+\thispagestyle{blank}
+\section{Atari 200M Scores}
+\vspace{-1ex}
+\input{tables/atari}
+\restoregeometry
+\clearpage
+
+\section{Hyperparameters}
+\input{tables/hparams}

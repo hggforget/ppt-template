@@ -1,0 +1,31 @@
+\begin{table}[h!]
+\begin{adjustwidth}{-10em}{-10em}
+\centering
+\begin{mytabular}{
+  colspec = {| L{10em} | C{4.5em} C{4.5em} C{4.5em} C{4.5em} C{4.5em} C{4.5em} |},
+  row{1} = {font=\bfseries},
+}
+
+\toprule
+Setting & SimPLe & \clap{EfficientZero} & SPR & IRIS & TWM & \llap{Dr}eamerV3 \\
+\midrule
+Mean score   & 33 & 190 & 70 & 104 & 95 & 112 \\
+Median score & 13 & 109 & 41 & 29 & 50 & 49 \\
+GPU days     & 10 & 1.2 & 0.2 & 7 & 0.8 & 0.5 \\
+\midrule
+Online planning        & --- &  X  & --- & --- & --- & --- \\
+Data augmentation      & --- & --- &  X  & --- & --- & --- \\
+Non-uniform replay     & --- &  X  &  X  & --- &  X  & --- \\
+Separate hparams       & --- & --- & --- &  X  & --- & --- \\
+Increased resolution   & --- &  X  &  X  & --- & --- & --- \\
+Uses life information  & --- &  X  &  X  &  X  &  X  & --- \\
+Uses early resets      & --- &  X  & --- &  X  & --- & --- \\
+Separate eval episodes &  X  &  X  &  X  &  X  &  X  & --- \\
+\bottomrule
+
+\end{mytabular}
+\end{adjustwidth}
+\vspace{-0.5ex}
+\caption{Algorithmic components, algorithmic components, and environment settings for the Atari 100k benchmark. GPU days are converted to V100 days by assuming P100 is twice as slow and A100 is twice as fast. EfficientZero achieves the highest scores but at the cost of complexity and changing the environment configuration. IRIS uses a separate exploration strength for Freeway.}
+\label{tab:atari100k_setting}
+\end{table}

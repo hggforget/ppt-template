@@ -1,0 +1,41 @@
+\begin{table*}[h!]
+\centering
+\begin{mytabular}{
+  colspec = {| L{12em} | C{5em} C{5em} C{5em} C{5em} |},
+  row{1} = {font=\bfseries},
+}
+
+\toprule
+Task & SAC & CURL & DrQ-v2 & DreamerV3 \\
+\midrule
+Environment Steps & 1M & 1M & 1M & 1M \\
+\midrule
+Acrobot Swingup & \o\o5.1 & \o\o5.1 & 128.4 & \textbf{\o210.0} \\
+Cartpole Balance & \textbf{963.1} & \textbf{979.0} & \textbf{991.5} & \textbf{\o996.4} \\
+Cartpole Balance Sparse & \textbf{950.8} & \textbf{981.0} & \textbf{996.2} & \textbf{1000.0} \\
+Cartpole Swingup & 692.1 & 762.7 & \textbf{858.9} & \textbf{\o819.1} \\
+Cartpole Swingup Sparse & 154.6 & 236.2 & 706.9 & \textbf{\o792.9} \\
+Cheetah Run & \o27.2 & 474.3 & 691.0 & \textbf{\o728.7} \\
+Cup Catch & 163.9 & \textbf{965.5} & \textbf{931.8} & \textbf{\o957.1} \\
+Finger Spin & 312.2 & \textbf{877.1} & \textbf{846.7} & \o818.5 \\
+Finger Turn Easy & 176.7 & 338.0 & 448.4 & \textbf{\o787.7} \\
+Finger Turn Hard & \o70.5 & 215.6 & 220.0 & \textbf{\o810.8} \\
+Hopper Hop & \o\o3.1 & 152.5 & 189.9 & \textbf{\o369.6} \\
+Hopper Stand & \o\o5.2 & 786.8 & \textbf{893.0} & \textbf{\o900.6} \\
+Pendulum Swingup & 560.1 & 376.4 & \textbf{839.7} & \textbf{\o806.3} \\
+Quadruped Run & \o50.5 & 141.5 & \textbf{407.0} & \o352.3 \\
+Quadruped Walk & \o49.7 & 123.7 & \textbf{660.3} & \o352.6 \\
+Reacher Easy & \o86.5 & 609.3 & \textbf{910.2} & \textbf{\o898.9} \\
+Reacher Hard & \o\o9.1 & 400.2 & \textbf{572.9} & \o499.2 \\
+Walker Run & \o26.9 & 376.2 & 517.1 & \textbf{\o757.8} \\
+Walker Stand & 159.3 & 463.5 & \textbf{974.1} & \textbf{\o976.7} \\
+Walker Walk & \o38.9 & 828.8 & 762.9 & \textbf{\o955.8} \\
+\midrule
+Median & 78.5 & 431.8 & 734.9 & \o\textbf{808.5} \\
+Mean & 225.3 & 504.7 & 677.4 & \o\textbf{739.6} \\
+\bottomrule
+
+\end{mytabular}
+\caption{DMC scores for visual inputs at 1M frames.}
+\label{tab:dmc_vision}
+\end{table*}

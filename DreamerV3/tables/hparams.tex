@@ -1,0 +1,49 @@
+\begin{table}[h!]
+\centering
+\begin{mytabular}{
+  colspec = {| L{15em} | C{6em} | C{10em} |},
+  row{1} = {font=\bfseries},
+}
+
+\toprule
+\textbf{Name} & \textbf{Symbol} & \textbf{Value} \\
+\midrule
+\multicolumn{3}{l}{\textbf{General}} \\
+\midrule
+Replay capacity (FIFO) & --- & $10^6\!\!$ \\
+Batch size & $B$ & 16 \\
+Batch length & $T$ & 64 \\
+Activation & --- & $\operatorname{LayerNorm}+\operatorname{SiLU}$ \\
+\midrule
+\multicolumn{3}{l}{\textbf{World Model}} \\
+\midrule
+Number of latents & --- & 32 \\
+Classes per latent & --- & 32 \\
+Reconstruction loss scale & $\beta_{\mathrm{pred}}$ & 1.0 \\
+Dynamics loss scale & $\beta_{\mathrm{dyn}}$ & 0.5 \\
+Representation loss scale & $\beta_{\mathrm{rep}}$ & 0.1 \\
+Learning rate & --- & $10^{-4}$ \\
+Adam epsilon & $\epsilon$ & $10^{-8}$ \\
+Gradient clipping & --- & 1000 \\
+\midrule
+\multicolumn{3}{l}{\textbf{Actor Critic}} \\
+\midrule
+Imagination horizon & $H$ & 15 \\
+Discount horizon & $1/(1-\gamma)$ & 333 \\
+Return lambda & $\lambda$ & 0.95 \\
+Critic EMA decay & --- & 0.98 \\
+Critic EMA regularizer & --- & 1 \\
+Return normalization scale & $S$ & $\operatorname{Per}(R, 95) - \operatorname{Per}(R, 5)$ \\
+Return normalization limit & $L$ & 1 \\
+Return normalization decay & --- & 0.99 \\
+Actor entropy scale & $\eta$ & $3\cdot10^{-4}$ \\
+Learning rate & --- & $3\cdot10^{-5}$ \\
+Adam epsilon & $\epsilon$ & $10^{-5}$ \\
+Gradient clipping & --- & 100 \\
+\bottomrule
+
+\end{mytabular}
+\caption{DreamerV3 hyper parameters. The same values are used across all benchmark suites, including proprioceptive and visual inputs, continuous and discrete actions, and 2D and 3D domains. We do not use any hyperparameter annealing, weight decay, or dropout.
+}
+\label{tab:hparams}
+\end{table}

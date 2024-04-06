@@ -1,0 +1,28 @@
+\begin{table*}[h!]
+\centering
+\begin{mytabular}{
+  colspec = {| L{9em} | C{4em} C{4em} | C{5em} C{5em} | C{5em} |},
+  row{1} = {font=\bfseries},
+}
+
+\toprule
+Task & Random & Human & IMPALA & DreamerV3 & IMPALA \\
+\midrule
+Environment Steps & --- & --- & 50M & 50M & 10B \\
+\midrule
+Goals Small & 7.7 & 267.5 & \o5.7 & 214.7 & 209.4 \\
+Goals Large & 3.1 & 194.5 & \o3.7 & \o68.1 & \o83.1 \\
+Apples Small & 3.6 & \o74.5 & \o3.7 & \o61.3 & \o57.8 \\
+Apples Large & 4.7 & \o65.7 & \o5.0 & \o32.3 & \o37.0 \\
+Deferred Effects & 8.5 & \o85.7 & 11.4 & \o34.5 & \o15.6 \\
+Keys Doors Puzzle & 4.1 & \o53.8 & \o5.1 & \o27.6 & \o28.0 \\
+Nonmatching & 0.3 & \o65.9 & \o1.8 & \o34.3 & \o\o7.3 \\
+Natlab Large & 2.2 & \o36.9 & \o2.4 & \o23.1 & \o34.7 \\
+\midrule
+Normalized Mean & 0.0\rlap{\%} & 100.0\rlap{\%} & 1.1\rlap{\%} & 54.2\rlap{\%} & 51.3\rlap{\%} \\
+\bottomrule
+
+\end{mytabular}
+\caption{DMLab scores. DreamerV3 achieves a human-normalized mean score of $54.2\%$ that exceeds IMPALA at $51.3\%$ while using 200 times fewer environment steps.}
+\label{tab:dmlab}
+\end{table*}

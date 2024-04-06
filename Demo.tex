@@ -8,11 +8,30 @@
 \usepackage{array}
 \usepackage{booktabs} %调整表格线与上下内容的间隔
 \usepackage{subcaption}
-\usepackage[linesnumbered,slide,algoruled]{algorithm2e}
+\usepackage[slide,algoruled]{algorithm2e}
 \usepackage{indentfirst}
 \usepackage{multirow}
 \usepackage{ulem}
+\usepackage{microtype}
+\usepackage{caption}
+\usepackage{fontspec}
+\usepackage{xcolor}
+\setmainfont{Times New Roman}
+\definecolor{ForestGreen}{RGB}{34,139,34}
+\definecolor{BrickRed}{RGB}{182,50,28}
+\definecolor{OliveGreen}{RGB}{60,128,49}
+\definecolor{CadetBlue}{RGB}{116,114,154}
+\definecolor{YellowGreen}{RGB}{152,204,112}
+\definecolor{DarkerOrange}{RGB}{200,100,0}
+\definecolor{myblue1}{RGB}{70,130,180}
 
+\definecolor{codegreen}{rgb}{0,0.5,0}
+\definecolor{codered}{rgb}{0.7,0.1,0.1}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{1,1,1}
+\newcommand{\newDream}[1]{{\color{codepurple} #1}}
+\newcommand{\newpid}[1]{{\color{codegreen} #1}}
 
 
 \usetheme[
@@ -70,16 +89,14 @@
 
 \section{overview}
 
-\begin{frame}[fragile]
+\begin{frame}[t, fragile]
 	\frametitle{overview}
 	% \setlength{\parindent}{2em}
 	\begin{spacing}{1.5}
 		SafeDreamer Project主要分为两个部分:
 		\begin{itemize}
-			\item RL算法. SafeDreamer 结合了世界模型、拉格朗日约束和PPO算法的
+			\item RL算法. SafeDreamer 结合了世界模型、拉格朗日约束和CEEM的
 			一种基于安全强化学习的智能导航算法
-		\end{itemize}
-		\begin{itemize}
 			\item Safety-Gymnasium. Safety-Gymnasium是一个基于MuJoCo引擎的仿真验证环境,
 			主要面向SafeRL算法的智能体仿真验证,它支持单、多智能体;基于OpenGL库,支持丰富的视觉输入;
 			高度可定制化;支持多种智能体和任务;并且集成一个SafeRL算法库。
@@ -88,560 +105,411 @@
 \end{frame}
 
 \section{RL算法}
-\begin{frame}[fragile]
+\begin{frame}[t, fragile]
 	\frametitle{SafeDreamer Algorithm}
 	% \setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
+	\begin{spacing}{1.3}
 		SafeDreamer是World Model, Lagrangian SafeRL methods和CCEM三种方法的结合,最终取得了良好的效果。
 		\begin{itemize}
-			\item World Model.World Model 是一种用来记忆和建模环境的神经网络模块,
+			\item \textbf{World Model:} World Model 是一种用来记忆和建模环境的神经网络模块,
 			在SafeDreamer中使用DreamerV3来作为World Model,其神经网络结构为RSSM.
-		\end{itemize}
-		\begin{itemize}
-			\item Lagrangian SafeRL methods.Lagrangian SafeRL methods 是一种通过拉格朗日方法来求解强
+			\item \textbf{Lagrangian SafeRL methods:} Lagrangian SafeRL methods 是一种通过拉格朗日方法来求解强
 			化学习中有约束优化问题的一种方法。在SafeDreamer中使用Lag-aug和PID-Lag来提高模型性能。
-		\end{itemize}
-		\begin{itemize}
-			\item CCEM.约束交叉熵方法(CCEM),:在每次迭代中，首先从策略分布中取样，选择一组精英样本策略，
+			\item \textbf{CCEM:} 约束交叉熵方法(CCEM),在每次迭代中，首先从策略分布中取样，选择一组精英样本策略，
 			并使用它们来更新策略分布。精英样本：我们使用约束值对样本策略进行排序,然后选择约束性能最好的策略。
 		\end{itemize}
 	\end{spacing}
 \end{frame}
 
-\subsection{Preliminaries}
+\subsection{Model Components}
 
-\begin{frame}[fragile]
-	\frametitle{World Model}
+\begin{frame}[t, fragile]
+	\frametitle{Model Components}
 	\begin{spacing}{1.5}
-		综合考虑各个仿真工具的优劣, 最终决定使用ns-3.
-		\begin{itemize}
-			\item 从工具的性质来说, QualNet以及Opnet均为
-				\textcolor{red}{商业软件}, 并不能免费获取;而ns-3是
-				\textcolor{blue}{开源软件}, 在Windows、MacOS、Linux上均
-				可以免费获取和使用,便于开发.
-			\item 从工具的维护情况来说, ns-3由一个活跃的社区维护, 最新版本
-				ns-3.39于\textcolor{blue}{2023年7月}发布; 而Opnet在被收购前的最
-				新免费版本为14.5,该版本于2012年发布, 距今已有\textcolor{red}{十
-				余年}.
-		\end{itemize}
-	\end{spacing}
-\end{frame}
-
-\subsection{ns-3的仿真能力}
-
-\begin{frame}[fragile]
-	\frametitle{仿真工具选择}
-	\begin{spacing}{1.5}
-		就仿真能力而言, ns-3的优势功能如下:
-		\begin{itemize}
-			\item ns-3提供了一个灵活的仿真框架, 可以轻松地创建和定制各种网络拓扑
-				和协议. ns-3可以对物理层、链路层、网络层等各个OSI层次进行修改和
-				定制.
-				\begin{itemize}
-					\item 在物理层, ns-3提供了多种模型和技术, 如无线信道模型、传
-						输介质模型等, 可以模拟不同类型的物理介质和信道特性.
-					\item 在链路层, ns-3支持多种链路层协议和技术, 如以太网、
-						Wi-Fi、LTE等. 用户可以使用现有的链路层协议模型, 也可以根
-						据需要自定义新的链路层协议.
-					\item 在网络层方面, ns-3支持多种网络层协议, 如IPv4、IPv6、路
-						由协议(如OSPF、BGP等). 
-				\end{itemize}
-		\end{itemize}
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{仿真工具选择}
-	\begin{spacing}{1.5}
-		\begin{itemize}
-			\item ns-3提供了丰富的可视化和分析工具, 可以帮助用户可视化仿真结果并
-				进行详细的性能分析. 这些工具可以帮助用户理解网络行为、优化协议和
-				算法, 并进行实验评估. 
-				\begin{figure}[htb]
-					\centering
-					\includegraphics[width=0.9\linewidth]{./images/net.png}
-					\caption{可视化工具NetAnim示意图}
-					\label{Fig:net}
-				\end{figure}
-		\end{itemize}
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{仿真工具选择}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		\begin{itemize}
-			\item 社区支持和文档丰富: ns-3拥有一个活跃的社区, 提供了广泛的文档、
-				教程和示例, 以帮助用户入门和解决问题.
-				\begin{figure}[htb]
-					\centering
-					\includegraphics[width=1\linewidth]{./images/pic.png}
-					\caption{ns-3详尽的API文档}
-					\label{Fig:pic}
-				\end{figure}
-		\end{itemize}
-	\end{spacing}
-\end{frame}
-
-\subsection{仿真面临的困难}
-\begin{frame}[fragile]
-	\frametitle{仿真工具选择}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		不过基于ns-3做仿真研究也有一些不足的地方: 在中文互联网上(知网等), 绝大部
-		分的数据链仿真都是使用Opnet开展的, 一小部分是使用QualNet仿真的, 只有极小
-		一部分是使用ns-3做的仿真, 这极大程度上增加了仿真研究的难度.
-
-		另一个严重的问题是, \textbf{几乎所有}有关数据链仿真的文章均未完整公开所有的代码细
-		节, 只是把整个功能模块当作一个黑盒笼统地介绍给读者, 读者完全无法深入了解
-		编码细节, 更无法对其仿真结果做复现; 在Github等开源平台上也完全无法找到前
-		人做过的仿真工作代码.
-	\end{spacing}
-\end{frame}
-
-
-\section{仿真内容确定}
-
-\begin{frame}[fragile]
-	\frametitle{仿真内容确定}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		有关仿真内容的确定考虑以一篇国防科大的博士论文
-		\cite{zhanshushujulianzuwang}为主线, 在此之上核查一下美军对数据链的官
-		方标准, 并尝试对其进行仿真实现.
-	\end{spacing}
-\end{frame}
-
-
-\subsection{战术数据链仿真平台框架}
-
-\begin{frame}[fragile]
-	\frametitle{战术数据链仿真平台框架}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		\begin{figure}[htb]
-			\centering
-			\includegraphics[width=1\linewidth]{./images/arch.png}
-			\caption{战术数据链仿真平台框架结构图}
-			\label{Fig:arch}
-		\end{figure}
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{战术数据链仿真平台框架}
-	% \setlength{\parindent}{2em}
-	该框架主要由5个部分构成:
-	\begin{spacing}{1.5}
-		\begin{itemize}
-			\item 作战任务与军事行动编辑器: 作战任务与军事行动是整个仿真实验的
-				``剧本''. 包括初始状态, 仿真过程 中即将发生的时间及其交互等. 作
-				战任务与军事行动编辑器的功能就是根据给定 的战术任务, 通过各种条
-				令条例和战法战例等生成整个仿真实验所需要的规范化 的剧情. 其中主
-				要包括战术想定方案的编辑、信息交换需求的确认与分析、战术 数据链
-				装备平台的选择以及战场环境的生成. 
-		\end{itemize}
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{战术数据链仿真平台框架}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		\begin{figure}[htb]
-			\centering
-			\includegraphics[width=1\linewidth]{./images/arch1.png}
-		\end{figure}
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{战术数据链仿真平台框架}
-	% \setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		\begin{itemize}
-			\item 战术数据链网络设计与通信规划工具: 根据若干网络资源分配规则与战
-				术数据链网络角色选择方案,  保证各项信息交换需求能够得到满足, 这
-				其中就包括指定并配置相 应的网络功能实现信息交换、指派合适的网络
-				角色履行其网络职责以及对有限的 战术数据链网络资源进行合理分配.
-				战术数据链组网设计规划工具最终生成组网 方案, 作为战术数据链通信
-				仿真引擎的输入, 驱动仿真引擎的模拟仿真. 
-		\end{itemize}
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{战术数据链仿真平台框架}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		\begin{figure}[htb]
-			\centering
-			\includegraphics[width=1\linewidth]{./images/arch2.png}
-		\end{figure}
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{战术数据链仿真平台框架}
-	% \setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		\begin{itemize}
-			\item 军事行动仿真引擎: 根据战术想定方案, 驱动整个仿真系统按照给定
-				的战术任务进行各项军事活动. 其中主要功能为根据作战任务与军事行动
-				编辑器 生成的剧情, 调度推演作战战法的实现过程, 即是控制各个作战
-				单元在某个时间 运动到某个地点, 发生某种作战动作, 触发某个战术信
-				息报文的发送和接收, 从 而推动整个``剧情''往前推进. 
-		\end{itemize}
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{战术数据链仿真平台框架}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		\begin{figure}[htb]
-			\centering
-			\includegraphics[width=1\linewidth]{./images/arch3.png}
-		\end{figure}
-	\end{spacing}
-\end{frame} 
-
-\begin{frame}[fragile]
-	\frametitle{战术数据链仿真平台框架}
-	% \setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		\begin{itemize}
-			\item 战术数据链通信仿真引擎: 取战术数据链组网设计规划工具产生的 组
-				网方案, 利用各种仿真模型模拟仿真每一个战术消息报文的发送和接收过
-				程,  触发各项军事活动以实现战术数据链军事行动仿真引擎交互, 记录
-				每次报文发送 和接收的结果数据, 为战术数据链仿真结果分析器提供原
-				始数据. 
-		\end{itemize}
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{战术数据链仿真平台框架}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		\begin{figure}[htb]
-			\centering
-			\includegraphics[width=1\linewidth]{./images/arch4.png}
-		\end{figure}
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{战术数据链仿真平台框架}
-	% \setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		\begin{itemize}
-			\item 战术数据链仿真结果分析器: 战术数据链仿真结果分析器, 主要根据军
-				事行动仿真引擎和战术数据链通信 仿真引擎产生的仿真结果数据, 统计
-				其中各项指标, 对照战术数据链信息交换需 求, 判断该组网方案是否能
-				够满足给定战术任务的要求. 
-		\end{itemize}
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{战术数据链仿真平台框架}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		\begin{figure}[htb]
-			\centering
-			\includegraphics[width=1\linewidth]{./images/arch5.png}
-		\end{figure}
-	\end{spacing}
-\end{frame}
-
-\subsection{数据链通信仿真引擎}
-\begin{frame}[fragile]
-	\frametitle{数据链通信仿真引擎}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		在上一章节提到的5个功能部件中, 数据链通信仿真引擎是整个仿真平台的核心部
-		分, 其按照各个战术数据链装备终端信息发送和接收原理, 根据组网方案描述的装
-		备平台初始化配置数据, 模拟仿真每一次战术信息报文在虚拟的战场环境中无线远
-		距离传输. 
-
-		该文章给出的仿真方案同样采用了分层模型的思路对整个通信系统做了拆解:
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{数据链通信仿真引擎}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		该文章给出的仿真方案同样采用了分层模型的思路对整个通信系统做了拆解:
-		\begin{figure}[htb]
-			\centering
-			\includegraphics[width=0.8\linewidth]{./images/layer.png}
-			\caption{战术数据链参考模型(TDLRM)}
-			\label{Fig:layer}
-		\end{figure}
-	\end{spacing}
-\end{frame}
-
-\subsubsection{应用层}
-
-\begin{frame}[fragile]
-	\frametitle{应用层}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.2}
-		应用层主要规定了数据信息的结构、传输方法, 并规定了提供通信功能数据传输
-		与操作的服务及协议, 根据具体规定来对不同信息组成的各种结构文件进行统
-		一的处理. 应用层是解决操作系统平台和传输数据的融合, 实现数据的形象解析,
-		便于任务控制和操作. 
-
-		Link-16 战术数据链的应用层根据不同的战术应用划分多个网络参与组, 每个作
-		战单元可以加入一个或多个网络参与组中, 支持各种战术任务要求. 其中三项重要
-		的应用是:
-		\begin{itemize}
-			\item 雷达跟踪数据的共享, 以支持精确的态势感知;
-			\item 精确参与定位与识别, 以向友军单元报告消息;
-			\item 任务管理, 提供任务分配、目标报告给战斗机.
-		\end{itemize}
+		SafeDreamer由world models和actor-critic models组成.
+		\begin{equation*}
+			\begin{split}
+			\begin{array}{ll}
+			\text {Observation encoder:} & z_t \sim E_\phi\left(z_t \mid h_t, o_t\right) \\ 
+			\text {Observation decoder:} & \hat{o}_t \sim O_\phi\left(\hat{o}_t \mid s_t\right) \\
+			\text {Reward decoder:} & \hat{r}_t \sim R_\phi\left(\hat{r}_t \mid s_t\right)  \\ 
+			\text {Cost decoder:} & \hat{c}_t \sim C_\phi\left(\hat{c}_t \mid s_t\right) \\
+			%\text {Continue decoder:} & \hat{u}_t \sim U_\phi\left(\hat{u}_t \mid s_t\right) \\
+			\text {Sequence model:} & h_t, \hat{z}_t=S_\phi\left(h_{t-1}, z_{t-1}, a_{t-1}\right) \\
+			%\text {Dynamics:} & \hat{z}_t \sim p_\phi\left(\hat{z}_t \mid h_t\right)\\
+			\text{Actor:} & a_{t} \sim \pi_{\theta}( a_t\mid s_t)\\
+			\text{Reward critic:} & \hat{v}_{r_t} \sim V_{\psi_r}(\hat{v}_{r_t} \mid s_t)\\
+			\text{Cost critic:} & \hat{v}_{c_t} \sim V_{\psi_c}(\hat{v}_{c_t} \mid s_t)\\
+			\end{array}
+			\end{split}
+		\label{eq:definition}
+		\end{equation*}
 		
-		其他应用包括往返定时、语音通信和自由文本数据通信等等.
 	\end{spacing}
 \end{frame}
 
+\subsection{Preliminaries}
+\subsubsection{Dreamer}
+\begin{frame}[t, fragile]
+  \frametitle{World Model}
+   \begin{figure}
+\begin{subfigure}{.5\textwidth}
+\includegraphics[width=0.75\linewidth]{SafeDreamer/images/model_wm.pdf}
+\caption{World Model Learning}
+\end{subfigure}
+\begin{subfigure}{.43\textwidth}
+\includegraphics[width=0.75\linewidth]{SafeDreamer/images/model_ac.pdf}
+\caption{Actor Critic Learning}
+\end{subfigure}
+\label{fig:model}
+\end{figure}
+{
+\fontsize{8pt}{9.6pt}\selectfont
+\begin{itemize}
+\item \textbf{包含的模型}：SafeDreamer包括世界模型和行动者-评论者模型。
+\item \textbf{处理观察和动作}：在每个时间步骤$t$，世界模型接收一个观察$o_t$和一个动作$a_t$，并将观察压缩为一个离散的表示$z_t$。
+\item \textbf{预测任务}：这个离散的表示$z_t$，连同动作，被序列模型用来预测下一个表示$\hat{z}_{t+1}$。
+\item \textbf{模型状态的定义}：模型状态$s_t=\{h_t, z_t\}$由一个循环状态$h_t$和表示$z_t$的联接表示。
+\item \textbf{解码器的作用}：解码器利用模型状态$s_t$预测观察，奖励和成本。
+\item \textbf{行动者-评论者模型的输入}：模型状态$s_t$充当行动者-评论者模型的输入，以预测奖励值$v_{r_t}$，成本值$v_{c_t}$和动作$a_t$。
+\end{itemize}
+}
+\end{frame}
+
 \begin{frame}[fragile]
-	\frametitle{应用层}
-	\setlength{\parindent}{2em}
+	\frametitle{Lagrangian-based methods}
+	PID 拉格朗日方法是一种广泛应用于约束优化问题的算法。它的学习动态通常会展示振荡和超调，这在保证响应性和牺牲安全性方面是一个挑战。PID 拉格朗日方法利用了 PID 控制器的概念，使用比例、积分和微分这三个成分来平衡和控制学习动态，以优化安全性和效率。
+	\begin{algorithm}[H]
+		\SetAlgoLined
+		\KwIn{Proportional coefficient $K_p$, integral coefficient $K_i$, differential coefficient $K_d$}
+		
+		Initialize previous integral item: $I^0 \leftarrow 0$\;
+		Initialize previous episode cost: $J_C^0 \leftarrow 0$\;
+		\While{iteration $k$ continues}{
+			Receive cost $J_C^k$\;
+			$P \leftarrow J_C^k-d$\;
+			$D \leftarrow max(0, J_C^{k}-J_C^{k-1})$\;
+			$I^k \leftarrow max(0, I^{k-1}+D)$\;
+			$\lambda_p \leftarrow max(0, K_p P+K_i I^k + K_d D)$\;
+			Return Lagrangian multiplier $\lambda_p$\;
+		}
+		\caption{PID Lagrangian}
+		\label{alg: pid_lag}
+		\end{algorithm}
+\end{frame}
+
+\begin{frame}[t, fragile]
+	\frametitle{CCEM}
+ Constrained Cross-Entropy Method 是一种应用于安全强化学习问题的方法。该方法特点在于，它会显式地跟踪其在满足约束方面的表现。特别是，该方法在有限长度的轨道上定义约束，这是以预期的成本形式表示的。
+	\begin{algorithm}[H]
+	\SetAlgoLined
+	\KwIn{Initial parameters $\theta_0$, initial Lagrange multipliers $\lambda_0$}
+	Initialize parameters: $\theta \leftarrow \theta_0$, Lagrange multipliers: $\lambda \leftarrow \lambda_0$\;
+	\While{the stop criterion is not met}{
+		Generate a set of samples $\mathcal{S}$ under the current model\;
+		Compute the utility values $u_s$ and constraint violation $c_s$ for all $s \in \mathcal{S}$\;
+		Select a set of "elite" samples $\mathcal{S}_{\text{elite}} = \{s \in \mathcal{S}: u_s \text{ is high and } c_s \text{ is low}\}$\;
+		Fit the model parameters $\theta$ with $\mathcal{S}_{\text{elite}}$\;
+		Update the Lagrange multipliers $\lambda$ according to $c_s$ and current $\lambda$\;
+	}
+	\caption{Constrained Cross-Entropy Method}
+	\end{algorithm}
+	\end{frame}
+
+\subsection{Architecture}
+\begin{frame}[t, fragile]
+	\frametitle{Architecture}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.9\linewidth]{./images/brain.pdf}
+		\caption{SafeDreamer Architecture}
+		\label{Fig:net}
+	\end{figure}
 	\begin{spacing}{1.5}
-		\begin{figure}[htb]
-			\centering
-			\includegraphics[width=0.5\linewidth]{./images/app.png}
-			\caption{应用层定时器周期生产消息报文}
-			\label{Fig:app}
-		\end{figure}
-	\end{spacing}
-\end{frame}
-
-\subsubsection{传输层}
-
-\begin{frame}[fragile]
-	\frametitle{传输层}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		传输层是利用通信子网为两台端机的应用进程之间, 提供端到端的性能可靠、 透
-		明传输的通信服务. 传输层最重要的两个传输层协议, 即无连接的 UDP 协议和 面
-		向连接的 TCP 协议. 
-
-		Link-16 战术数据链传输层提供传输媒介, 每个 NPG 的消息报文在特定的时隙组
-		中以广播方式发送. 这些消息报文不包含目的地址(消息报文包含源地址).  同一
-		网络中的任何接收机可以从一个特定 NPG 中接收与之有关的消息报文. 所以,
-		Link-16 战术数据链的传输层既不是 UDP 也不是 TCP, 是广播方式发送消息, 功
-		能比较简单. 
-	\end{spacing}
-\end{frame}
-
-\subsubsection{网络层}
-
-\begin{frame}[fragile]
-	\frametitle{网络层}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		网络层可以认为是端到端传输的最底层, 主要解决分组从源端沿着网络路径 送达
-		目标端的路由协议的实现(包括地址编址方案)和算法的分析选择问题. 
-
-		关于 Link-16 战术数据链的路由管理, 主要是通过泛洪算法来发现邻居, 将消息
-		报文从源节点发送出去, 实现节点之间的通信. 
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{网络层}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		\begin{figure}[htb]
-			\centering
-			\includegraphics[width=0.6\linewidth]{./images/flood.png}
-			\caption{基于洪泛方式的中继转发消息报文流程}
-			\label{Fig:flood}
-		\end{figure}
-	\end{spacing}
-\end{frame}
-
-\subsubsection{链路层}
-
-\begin{frame}[fragile]
-	\frametitle{链路层}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		数据链路层主要解决链路的建立、拆除、管理等功能, 以及数据的接入差错 控制
-		等方面的问题; 数据链路层不仅能提供移动终端之间的逻辑连接, 还能提供 媒体
-		访问的功能和用于连接处理的通信管理功能. 
-
-		Link-16 战术数据链采用网络参与组的概念, 消息报文在链路层分类集合排队,
-		做好发送前的准备, 以便选择适当的时隙发送出去. 由此可见, Link-16 的链路层
-		从功能上来进一步细分, 可分为接口队列缓冲池(InterFace QueueS, IFqs)和媒介
-		控制接入子层(Media Control Access, MAC). 
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{链路层}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		\begin{figure}[htb]
-			\centering
-			\includegraphics[width=0.9\linewidth]{./images/fifo.png}
-			\caption{多队列缓冲池结构}
-			\label{Fig:fifo}
-		\end{figure}
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{链路层}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		\begin{figure}[htb]
-			\centering
-			\includegraphics[width=0.8\linewidth]{./images/tdma.png}
-			\caption{TDMA协议的关键时隙控制执行过程}
-			\label{Fig:mac}
-		\end{figure}
-	\end{spacing}
-\end{frame}
-
-\subsubsection{物理层}
-\begin{frame}[fragile]
-	\frametitle{物理层}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		物理层负责频率选择, 接收和发送链路层的信息, 确定定时位同步信息, 同 时解
-		决通信平台和数据传输线路之间的连接协议和接口问题.
-
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{物理层}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		Link-16 战术数据链系统通过多网结构的工作方式来达到系统扩充容量的目的.
-		每个网络单元在参与的不同的网络参与组中处在不同的网络, 相当于处在多个互不
-		干扰的无线信道之一, 这样使得不同网络参与组的多个成员可以使用同一组时隙工
-		作. 
-
-		\begin{figure}[htb]
-			\centering
-			\includegraphics[width=0.8\linewidth]{./images/multi.png}
-			\caption{Link-16多网结构}
-			\label{Fig:multi}
-		\end{figure}
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{物理层}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		为了提高系统传输的抗干扰性, Link-16 战术数据链采用了跳频技术. 在每个单网
-		结构(或是单个无线信道)中, 消息报文的波形在 Lx 波段960MHz\~1215MHz 上 51
-		个离散的载波频率上均匀分布并以 76923Hop/s 的跳频速率快速跳变. 
-
-		\begin{figure}[htb]
-			\centering
-			\includegraphics[width=0.8\linewidth]{./images/jump.png}
-			\caption{Link-16跳频技术}
-			\label{Fig:jump}
-		\end{figure}
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{物理层}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		\begin{figure}[htb]
-			\centering
-			\includegraphics[width=0.6\linewidth]{./images/phy.png}
-			\caption{多信道跳频收发消息流程}
-			\label{Fig:phy}
-		\end{figure}
-	\end{spacing}
-\end{frame}
-
-\section{仿真方式与流程}
-
-\begin{frame}[fragile]
-	\frametitle{仿真方式与流程}
-	% \setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
-		总的来说, 仿真的流程如下:
-		\begin{enumerate}
-			\item 根据战术任务实施区域(即作战区域)的大小配置仿真场景的大小;
-			\item 根据战术任务实施过程参战单元的数量、类型以及地理位置部署配置网
-				络拓扑;
-			\item 根据战术任务实施过程所拟定的作战方案(其中包括各参战单元移动
-				方 向和速度等)配置节点的移动性;  
-			\item 根据战术任务所要求的网络参与群数量、类型以及各网络参与群的
-				参与 节点相应地配置网络功能;  
-			\item 根据信息交换需求所拟定的各节点发送战术消息的类型、时间、速
-				率以及数据量大小等配置各个节点的消息流量;  
-		\end{enumerate}
-	\end{spacing}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{仿真方式与流程}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.3}
-		\begin{enumerate}
-			\item[6.] 通过选择合适的节点担任相应的网络职责(如网络时间基准和中继节
-				点 等)配置网络角色;  
-			\item[7.] 将时间、频率和信道等网络资源具体分配到每个节点实现网络资源
-				的配置;  
-			\item[8.] 通过设置障碍、噪声和干扰等来配置作战环境; 
-			\item[8.] 设置各个节点所装备的终端平台类型, 确定其天线类型、调制方式、
-				带宽和功率等, 配置好通信终端;  
-			\item[10.] 根据终端平台类型确定信道接入方式(如 Link-11 战术数据链的轮
-				询方式与 Link-16 战术数据链的 TDMA 专用/竞争方式), 配置通信协议;  
-			\item[11.] 通过对仿真时间、随机种子数等的配置, 运行仿真, 并对相关数据
-				进行统计;  
-			\item[12.] 根据仿真需求, 对结果进行分析, 并输出相应指标的分析结果, 包
-				括时延、时延抖动、丢失率等. 
-		\end{enumerate}
-	\end{spacing}
-\end{frame}
-
-\section{目前进度与方向}
-\begin{frame}[fragile]
-	\frametitle{目前进度与方向}
-	\setlength{\parindent}{2em}
-	\begin{spacing}{1.5}
+		OSPR和BSPR是SafeDreamer中的两种实现方式:
+		{
+		\fontsize{10}\selectfont
 		\begin{itemize}
-			\item 正学习利用ns-3搭一个简易的数据链通信仿真引擎的demo出来, 暂时不
-				考虑军事行动编辑器、行动仿真引擎、结果分析器等框架中的其余组件.
-				\begin{itemize}
-					\item 在通信引擎内部, 考虑暂时跳过一些具体的技术细节, 先把参
-						考分层模型的几层结构都搭建出来, 保留好用于拓展的接口, 以
-						便后续添加细节.
-				\end{itemize}
-			\item 仿真的可视化模块也暂时不考虑.
+			\item OSPR:每个决策时间点t都会进行在线规划过程,
+			该过程会在世界模型中从当前状态st生成状态-动作轨迹。
+			每个轨迹都会通过学习到的奖励和成本模型以及它们的评价者进行评估，
+			从中选出最优的安全动作轨迹在环境中执行。
+			\item BSPR:在执行者训练期间，
+			我们在后台的世界模型中产生长度为T=15的想象的潜在回滚。
+			我们从重播缓冲区的观察开始，从执行者中采样动作，
+			并从世界模型中获取观察结果。
 		\end{itemize}
+		}	
 	\end{spacing}
 \end{frame}
 
+\begin{frame}[t, fragile]
+	\frametitle{OSPR}
+	\begin{minipage}[t]{0.40\linewidth}
+	OSPR在进行轨迹采样的每一步中,会使用Planner生成Action.
+	\end{minipage}\hfill
+	\begin{minipage}[t]{0.60\linewidth}
+	\begin{algorithm}[H]
+	\SetAlCapNameFnt{\fontsize{8pt}{9.6pt}\selectfont} 
+	\SetAlCapFnt{\fontsize{8pt}{9.6pt}\selectfont}
+	\fontsize{8pt}{9.6pt}\selectfont
+	\DontPrintSemicolon
+	\SetNoFillComment
+	\SetAlgoLined
+	\textbf{Input:} current model state $s_{t}$, planning horizon $H$,\\
+	num sample/policy/safe trajectories $N_{\pi_\mathcal{N}}, N_{\pi_\theta}, N_{s}$,\\
+	Lagrangian multiplier $\lambda_p$, cost limit $b$, $\mu^{0}, \sigma^{0}$ for $\mathcal{N}$\\
+	\For{$j \gets 1 $ \KwTo J}{
+	   Init. empty safe/candidate/elite actions set $A_s, A_c, A_e$\\
+	   Sample $N_{\pi_{\mathcal{N}}}+N_{\pi_\theta}$ traj. $\{ s_{i}, a_{i}, s_{i+1}\}_{i=t}^{t+H}$ using $\mathcal{N}(\mu^{j-1}, (\sigma^{j-1})^{2}\mathrm{I})$, $\pi_{\theta}$ within $S_{\phi}$ with  $s_t$ as the initial state\\
+	   Select the top-k action trajectories with highest $\Omega$ values among $A_c$ as elite actions $A_e$\\
+	   $\mu^j, \sigma^j = \mathrm{MEAN}\left(A_e\right), \mathrm{STD}\left(A_e\right)$ 
+	}
+	\textbf{Return: } $a \sim \mathcal{N}(\mu^{J}, (\sigma^{J})^{2} \mathrm{I})$
+	\caption{Online Safety-Reward Planning.}
+	\label{alg:planning}
+	\end{algorithm}
+	\end{minipage}
+	\end{frame}
 
-\section{参考文献}
-\begin{frame}{参考文献}
-    \begin{tiny}
-        \bibliographystyle{unsrt}
-        \bibliography{ref}
-    \end{tiny}
+\begin{frame}[t, fragile]
+	\frametitle{BSPR}
+	\begin{minipage}[t]{0.20\linewidth}
+	BSPR
+	\end{minipage}\hfill
+	\begin{minipage}[t]{0.80\linewidth}
+	\begin{algorithm}[H]
+	\SetAlCapNameFnt{\fontsize{6pt}{7.2pt}\selectfont} 
+	\SetAlCapFnt{\fontsize{6pt}{7.2pt}\selectfont}
+	\fontsize{6pt}{7.2pt}\selectfont
+	\DontPrintSemicolon
+	\SetNoFillComment
+	\SetAlgoLined
+	\KwIn{batch length $T$, batch size $B$, episode length $L$, initial Lagrangian multiplier $\lambda_p$}
+Initialize the world models parameters $\phi$, actor-critic parameters $\theta, V_{\psi_r}, V_{\psi_c}$ \;
+Initialize dataset $\mathcal{D}$ using a random policy\;
+\While{\emph{not converged}}{
+  Sample $B$ trajectories $\{ o_{t}, a_{t}, o_{t+1}, r_{t+1}, c_{t+1}\}_{t:t+T} \sim \mathcal{D}$ \;
+  Update the world models via minimize Equation \eqref{eq:world_model_loss} \;
+  Condense $o_{t:t+T}$ into $s_{t: t+T}$ via world models\;
+Generate latent rollouts using the actor within the world model with $s_{t: t+T}$ as the initial state\;
+  Update the reward and cost critics via minimize Equation \eqref{eq:reward_critic_loss}\;
+  \newDream{Update the safe actor and $\lambda_p$ via Equation \eqref{eq:safe_actor_loss} and Equation \eqref{eq:lag}} \tcp*{Only BSRP-Lag}
+  $\mathcal{J}_{\mathcal{C}} \leftarrow 0$\;
+  \For{$t = 1$ to $L$}{
+    Condense $o_t$ into latent state via ${s}_t \sim S_\phi(o_t, s_{t-1}, a_{t-1})$\;
+    \newDream{Sample $a_t \sim \pi_a(\cdot | s_t)$}\tcp*{Only BSRP-Lag}
+    \newpid{Sample $a_t \sim Planner(s_t, \lambda_p)$}\tcp*{Only OSRP-Lag or OSRP}
+    Execute action $a_t$, observe $o_{t + 1},r_{t+1}, c_{t+1}$ returned from the environment\;
+    Update dataset $\mathcal{D} \leftarrow \mathcal{D} \cup\left\{o_{t}, a_{t}, o_{t+1}, r_{t+1}, c_{t+1}\right\}$\;
+    $\mathcal{J}_{\mathcal{C}} \leftarrow \mathcal{J}_{\mathcal{C}} + c_{t+1}$\;
+  }
+  \newpid{Use $\mathcal{J}_{\mathcal{C}}$ to update $\lambda_p$ via Algorithm \ref{alg: pid_lag}}\tcp*{Only OSRP-Lag}
+}
+\caption{~~SafeDreamer. Color \newpid{green is OSRP-Lag or OSRP}, \newDream{purple is BSRP-Lag}}
+\label{alg: train_model_ac}
+	\end{algorithm}
+	\end{minipage}
+
+\end{frame}
+
+\section{Safety-Gymnasium}
+
+\subsection{intro}
+\begin{frame}[t, fragile]
+\frametitle{Safety-Gymnasium}
+
+\begin{minipage}[t]{\textwidth}
+   \textbf{Safety-Gymnasium:} 这是一个专为安全强化学习（SafeRL）构建的仿真环境, 基于 Gymnasium 和 MuJoCo 构建.通过增强现有的 Safety Gym 框架, 支持\textbf{\textcolor{red}{vision-only}}和多智能体任务. 此外, 该项目还集成了 SafePO, 一个单文件风格的算法库, 包含超过 16 种最新的算法。
+   
+   \vspace{0.3cm}
+   
+   \textbf{主要组成部分:}
+   \vspace{0.2cm}
+
+\begin{enumerate*}{inline=True}
+    \item 智能体模型, and-
+    \item 安全任务
+    \item 安全约束
+\end{enumerate*}
+\end{minipage}
+
+% \begin{minipage}[t]{\textwidth}
+% \begin{columns}
+% \begin{column}{0.35\textwidth}
+%   \textbf{主要组成部分:}
+%   \begin{enumerate}
+%     \item 智能体模型
+%     \item 安全任务
+%     \item 安全约束
+%   \end{enumerate}
+% \end{column}
+
+% \begin{column}{0.65\textwidth}
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=0.95\textwidth]{SafeDreamer/images/task.pdf}
+%   \vspace*{-0.5\baselineskip}
+%   \setbeamerfont{caption}{size=\tiny}
+%   \caption{Tasks from Safety-Gymnasium.}
+%   \label{fig:task}
+% \end{figure}
+% \end{column}
+% \end{columns}
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=0.8\textwidth]{Safety-Gymnasium/assets/main-paper/agent.pdf}
+%   \vspace*{-0.5\baselineskip}
+%   \setbeamerfont{caption}{size=\tiny}
+%   \caption{Tasks from Safety-Gymnasium.}
+%   \label{fig:task}
+% \end{figure}
+% \end{minipage}
+\vfill
+\begin{minipage}[bp]{\textwidth}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.95\textwidth]{SafeDreamer/images/task.pdf}
+  \vspace*{-0.8\baselineskip}
+  \caption{Tasks from Safety-Gymnasium.}
+  \label{fig:task}
+\end{figure}
+
+\end{minipage}
+
+\end{frame}
+\subsection{Agents}
+\begin{frame}[t,fragile]
+    \frametitle{智能体模型}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.9\linewidth]{Safety-Gymnasium/assets/main-paper/agent.pdf}
+  \vspace*{-0.5\baselineskip}
+  \setbeamerfont{caption}{size=\tiny}
+  \caption{\textbf{Upper: }The Single-Agent Robots. \textbf{Lower:} The Multi-Agent Robots.}
+  \label{pic:agent}
+\end{figure}
+\vspace{-0.5cm}
+\begin{itemize}
+{
+\fontsize{8pt}{9.6pt}\selectfont
+    \item \textbf{预设机器人:} Safety-Gymnasium 继承了 Safety Gym 里的三种现有智能体——Point，Car 和 Doggo。
+    \item \textbf{优化改进:} 通过精心调整模型参数，成功地缓解了 Point 和 Car 智能体在运行中过度振荡的问题。
+    \item \textbf{新增机器人:} 在此基础上，引入了两种额外的机器人 —— racecar 和 ant，以丰富单智能体场景。
+    \item \textbf{多智能体机器人:} 从多智能体 MuJoCo 中借鉴了一些配置，解构了原本的单智能体结构，并使多个智能体可以控制不同的身体部分。
+}
+\end{itemize}
 \end{frame}
 
 
-{\xdbg%末页致谢
-\begin{frame}[plain,noframenumbering]
- \finalpage{{\huge 感谢观看！}}
-\end{frame}}
+\subsection{Tasks}
+\begin{frame}[t,fragile]
+    \frametitle{安全任务}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.9\linewidth]{Safety-Gymnasium/assets/main-paper/tasks.pdf}
+  \caption{Tasks of Gymnasium-based Environments}
+  \label{pic:agent}
+\end{figure}
+\vspace{-0.5cm}
+\begin{itemize}
+{
+\fontsize{8pt}{9.6pt}\selectfont
+    \item \textbf{Velocity:} 通过对铰链施加扭矩，使机器人在前向（右）方向上协调腿部运动。
+    \item \textbf{Run:} 机器人从随机的初始方向和特定的初始速度开始，努力到达地图的另一边。
+    \item \textbf{Circle:} 通过沿着绿色圆移动且不能进入红色区域外部来最大化奖励，因此，它的最优路径遵循 AD 和 BC 的线段。
+    \item \textbf{Goal:} 机器人导航至多个目标位置。成功到达一个目标后，其位置在保持整体布局不变的情况下随机重置。
+    \item \textbf{Push:} 目标是将一个盒子移动到一系列目标位置。与Goal任务类似，每个成就后会生成新的随机目标位置。
+    \item \textbf{Button:} 目标是激活环境中分布的一系列目标按钮。智能体的目标是导航至并接触当前突出显示的按钮，称为目标按钮。
+}
+\end{itemize}
+\end{frame}
+
+
+
+\subsection{Constraints}
+\begin{frame}[t,fragile]
+    \frametitle{安全约束}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.9\linewidth]{Safety-Gymnasium/assets/main-paper/constraints.pdf}
+  \caption{Constraints of Gymnasium-based Environments}
+  \label{pic:agent}
+\end{figure}
+\vspace{-0.5cm}
+\begin{spacing}{1.2}
+\begin{itemize}
+{
+\fontsize{8pt}{9.6pt}\selectfont
+    \item \textbf{Velocity-Constraint:} 在这些任务中，智能体通过更快地移动来获得更高的奖励，但也必须遵守速度限制以确保安全。
+    \item \textbf{Pillars:} 用于在环境中表示大型圆柱形障碍。在一般情况下，接触柱子会产生代价。
+    \item \textbf{Hazards:} 用于模拟环境中的危险区域，对智能体进入这些区域造成代价。
+    \item \textbf{Sigwalls:} 开发的特殊用于Circle任务。从安全区内部越过围墙到外部会产生代价。
+    \item \textbf{Vases:} 代表环境中的静态和易碎物体。触摸或移动这些物体会对智能体产生代价。
+    \item \textbf{Gremlins:} 代表环境中可以与智能体互动的移动物体。
+}
+\end{itemize}
+\end{spacing}
+\end{frame}
+
+
+
+\subsection{Vision-only tasks}
+\begin{frame}[t,fragile]
+    \frametitle{Vision-only tasks}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.9\linewidth]{Safety-Gymnasium/assets/main-paper/vision-task.pdf}
+  \caption{Vision-only Tasks of Gymnasium-based Environments.}
+  \label{pic:agent}
+\end{figure}
+\vspace{-0.5cm}
+\begin{spacing}{1.2}
+原始框架的不足：
+\begin{itemize}
+{
+\fontsize{8pt}{9.6pt}\selectfont
+   
+    \item \textbf{环境逼真度低：}尽管Safety Gym的初始版本提供了基本的视觉输入支持，但其环境的逼真性有待提高。
+Safety Gymnasium的改进：
+}
+\end{itemize}
+Safety Gymnasium的改进：
+\begin{itemize}
+{
+\fontsize{8pt}{9.6pt}\selectfont
+   
+       \item \textbf{提高环境逼真度：}Safety Gymnasium使用MuJoCo模型制定了一个更真实的视觉环境，增强了环境的逼真性。
+    \item \textbf{整合了更多的视觉输入：}相较于原始框架，这个改进版的环境能够整合RGB和RGB-D这两种输入，从而提供了更为准确和全面的视觉信息。
+}
+\end{itemize}
+\end{spacing}
+\end{frame}
+
+\subsection{SafePO}
+\begin{frame}[t,fragile]
+
+    \frametitle{SafePO}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\linewidth]{Safety-Gymnasium/assets/main-paper/arch.pdf}
+  \vspace*{-0.5\baselineskip}
+  \caption{The Architecture of \texttt{SafePO}}
+  \label{pic:architecture}
+\end{figure}
+\vspace{-0.5cm}
+\begin{itemize}
+{
+\fontsize{8pt}{9.6pt}\selectfont
+    \item \textbf{正确性:} SafePO确保了高度的准确性与可靠性，与现有基准相比具备超越或匹敌的性能。
+    \item \textbf{可扩展性:} 新算法可以方便地集成到SafePO中，增强其可扩展性。
+    \item \textbf{日志记录和可视化:} SafePO支持TensorBoard和WandB，提供了许多参数和结果的可视化，使训练过程透明化。
+    \item \textbf{详细的文档指南:} SafePO配有详尽的文档，从安装指南到高级定制都有涵盖，方便用户参考使用。
+}
+\end{itemize}
+
+\end{frame}
+
 
 \end{document} 

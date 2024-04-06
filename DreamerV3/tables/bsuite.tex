@@ -1,0 +1,41 @@
+\begin{table}[h!]
+\centering
+\begin{mytabular}{
+  colspec = {| L{11em} L{12.5em} | C{5.5em} | C{5.5em} |},
+  row{1} = {font=\bfseries},
+}
+
+\toprule
+Task & Categories & Muesli & \clap{DreamerV3} \\
+\midrule
+\texttt{bandit} & basic                                    & 0.908 & 0.859 \\
+\texttt{bandit\_noise} & noise                             & 0.721 & 0.602 \\
+\texttt{bandit\_scale} & scale                             & 0.674 & 0.680 \\
+\texttt{cartpole} & basic, credit., generalization         & 0.906 & 0.853 \\
+\texttt{cartpole\_noise} & noise, generalization           & 0.841 & 0.664 \\
+\texttt{cartpole\_scale} & scale, generalization           & 0.701 & 0.779 \\
+\texttt{cartpole\_swingup} & exploration, generalization   & 0.000 & 0.000 \\
+\texttt{catch} & basic, credit assignment                  & 0.955 & 0.970 \\
+\texttt{catch\_noise} & noise, credit assignment           & 0.464 & 0.571 \\
+\texttt{catch\_scale} & scale, credit assignment           & 0.929 & 0.977 \\
+\texttt{deep\_sea} & exploration                           & 0.000 & 0.000 \\
+\texttt{deep\_sea\_stochastic} & exploration, noise        & 0.000 & 0.341 \\
+\texttt{discounting\_chain} & credit assignment            & 0.453 & 0.290 \\
+\texttt{memory\_len} & memory                              & 0.609 & 0.478 \\
+\texttt{memory\_size} & memory                             & 0.706 & 0.706 \\
+\texttt{mnist} & basic, generalization                     & 0.790 & 0.762 \\
+\texttt{mnist\_noise} & noise, generalization              & 0.334 & 0.416 \\
+\texttt{mnist\_scale} & scale, generalization              & 0.615 & 0.477 \\
+\texttt{mountain\_car} & basic, generalization             & 0.797 & 0.949 \\
+\texttt{mountain\_car\_noise} & noise, generalization      & 0.441 & 0.590 \\
+\texttt{mountain\_car\_scale} & scale, generalization      & 0.400 & 0.948 \\
+\texttt{umbrella\_distract} & credit assignment, noise     & 0.217 & 0.957 \\
+\texttt{umbrella\_length} & credit assignment, noise       & 0.173 & 0.783 \\
+\bottomrule
+Category mean & & 0.537 & 0.627 \\
+\bottomrule
+
+\end{mytabular}
+\caption{BSuite scores per environment averaged over environment configurations.}
+\label{tab:bsuite}
+\end{table}

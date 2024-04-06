@@ -1,0 +1,18 @@
+\section*{Conclusion}
+\label{sec:discussion}
+
+This paper presents DreamerV3, a general and scalable reinforcement learning algorithm that masters a wide range of domains with fixed hyperparameters.
+To achieve this, we systematically address varying signal magnitudes and instabilities in all of its components. DreamerV3 succeeds across 7 benchmarks and establishes a new state-of-the-art on continuous control from states and images, on BSuite, and on Crafter.
+Moreover, DreamerV3 learns successfully in 3D environments that require spatial and temporal reasoning, outperforming IMPALA in DMLab tasks using 130 times fewer interactions and being the first algorithm to obtain diamonds in Minecraft end-to-end from sparse rewards.
+Finally, we demonstrate that the final performance and data-efficiency of DreamerV3 improve monotonically as a function of model size.
+
+Limitations of our work include that DreamerV3 only learns to sometimes collect diamonds in Minecraft within 100M environment steps, rather than during every episode.
+Despite some procedurally generated worlds being more difficult than others, human experts can typically collect diamonds in all scenarios.
+Moreover, we increase the speed at which blocks break to allow learning Minecraft with a stochastic policy, which could be addressed through inductive biases in prior work.
+To show how far the scaling properties of DreamerV3 extrapolate, future implementations at larger scale are necessary.
+In this work, we trained separate agents for all tasks.
+World models carry the potential for substantial transfer between tasks.
+Therefore, we see training larger models to solve multiple tasks across overlapping domains as a promising direction for future investigations.
+
+\paragraph{Acknowledgements}
+We thank Oleh Rybkin, Mohammad Norouzi, Abbas Abdolmaleki, John Schulman, and Adam Kosiorek for insightful discussions. We thank Bobak Shahriari for training curves of baselines for proprioceptive control, Denis Yarats for training curves for visual control, Surya Bhupatiraju for Muesli results on BSuite, and Hubert Soyer for providing training curves of the original IMPALA experiments. We thank Daniel Furrer, Andrew Chen, and Dakshesh Garambha for help with using Google Cloud infrastructure for running the Minecraft experiments.

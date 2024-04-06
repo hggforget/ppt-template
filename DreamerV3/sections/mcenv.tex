@@ -1,0 +1,42 @@
+\newgeometry{top=1.5cm,bottom=2cm,left=2cm,right=2cm,footskip=14pt}
+
+\section{Minecraft Environment}
+\label{sec:mcenv}
+
+\paragraph{Minecraft}
+With 100M monthly active users, Minecraft is one of the most popular video games worldwide.
+Minecraft features a procedurally generated 3D world of different biomes, including plains, forests, jungles, mountains, deserts, taiga, snowy tundra, ice spikes, swamps, savannahs, badlands, beaches, stone shores, rivers, and oceans.
+The world consists of 1 meter sized blocks that the player and break and place.
+There are about 30 different creatures that the player can interact and fight with.
+From gathered resources, the player can use 379 recipes to craft new items and progress through the technology tree, all while ensuring safety and food supply to survive.
+There are many conceivable tasks in Minecraft and as a first step, the research community has focused on the salient task of obtaining a diamonds, a rare item found deep underground and requires progressing through the technology tree.
+
+\paragraph{Environment}
+We built the Minecraft Diamond environment on top of MineRL to define a flat categorical action space and fix issues we discovered with the original environments via human play testing.
+For example, when breaking diamond ore, the item sometimes jumps into the inventory and sometimes needs to be collected from the ground.
+The original environment terminates episodes when breaking diamond ore so that many successful episodes end before collecting the item and thus without the reward.
+We remove this early termination condition and end episodes when the player dies or after 36000 steps, corresponding to 30 minutes at the control frequency of 20Hz.
+Another issue is that the jump action has to be held for longer than one control step to trigger a jump, which we solve by keeping the key pressed in the background for 200ms.
+We built the environment on top of MineRL v0.4.4 \citep{guss2019minerl}, which offers abstract crafting actions. The Minecraft version is 1.11.2.
+
+\paragraph{Rewards}
+We follow the same sparse reward structure of the MineRL competition environment that rewards 12 milestones leading up to the diamond, namely collecting the items log, plank, stick, crafting table, wooden pickaxe, cobblestone, stone pickaxe, iron ore, furnace, iron ingot, iron pickaxe, and diamond.
+The reward for each item is only given once per episode, and the agent has to learn autonomously that it needs to collect some of the items multiple times to achieve the next milestone. 
+To make the return curves easy to interpret, we give a reward of $+1$ for each milestone instead of scaling rewards based on how valuable each item is.
+Additionally, we give a small reward of $-0.01$ for each lost heart and $+0.01$ for each restored heart, but we did not investigate whether this was helpful.
+
+\paragraph{Inputs}
+The sensory inputs include the $64\times64\times3$ RGB first-person camera image, the inventory counts as a vector with one entry for each of the game's over 400 items, the vector of maximum inventory counts since episode begin to tell the agent which milestones it has already achieved, a one-hot vector indicating the equipped item, and scalar inputs for the health, hunger, and breath levels.
+
+\paragraph{Actions}
+The MineRL environment provides a dictionary action space and delegates choosing a simple action space to the user. We use a flat categorical action space with 25 actions for walking in four directions, turning the camera in four directions, attacking, jumping, placing items, crafting items near a placed crafting table, smelting items near a placed furnace, and equipping crafted tools. Looking up and down is restricted to the range $-60$ to $+60$ degrees. The action space is specific to the diamond task and does not allow the agent to craft all of the 379 recipes. For multi-task learning, a larger factorized action space as available in MineDojo \citep{fan2022minedojo} would likely be beneficial.
+
+\paragraph{Break Speed Multiplier}
+We follow \citet{kanitscheider2021minecraftcurriculum} in allowing the agent to break blocks in fewer time steps.
+Breaking blocks in Minecraft requires holding the same key pressed for sometimes hundreds of time steps.
+Briefly switching to a different key will reset this progress.
+Without an inductive bias, stochastic policies will almost never sample the same action this often during exploration under this parameterization.
+To circumvent this issue, we set the break speed multiplier option of MineRL to 100.
+In the future, inductive biases such as learning action repeat as part of the agent \citep{park2021timeinvariantpg} could overcome this caveat.
+
+\restoregeometry

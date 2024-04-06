@@ -1,0 +1,25 @@
+\newgeometry{top=1.5cm,bottom=2cm,left=2cm,right=2cm,footskip=14pt}
+\section{Summary of Differences}
+\label{sec:diff}
+
+DreamerV3 builds upon the DreamerV2 algorithm \citep{hafner2020dreamerv2}. This section describes the main changes that we applied in order to master a wide range of domains with fixed hyperparameters and enable robust learning on unseen domains.
+
+\begin{itemize}
+\itempar{Symlog predictions} We symlog encode inputs to the world model and use symlog predictions with squared error for reconstructing inputs. The reward predictor and critic use twohot symlog predictions, a simple form of distributional reinforcement learning \citep{bellemare2017c51}.
+\itempar{World model regularizer} We experimented with different approaches for removing the need to tune the KL regularizer, including targeting a fixed KL value. A simple yet effective solution turned out to combine KL balancing that was introduced in DreamerV2 \citep{hafner2020dreamerv2} with free bits \citep{kingma2016freebits} that were used in the original Dreamer algorithm \citep{hafner2019dreamer}. GECO \citep{rezende2018geco} was not useful in our case because what constitutes ``good'' reconstruction error varies widely across domains.
+\itempar{Policy regularizer} Using a fixed entropy regularizer for the actor was challenging when targeting both dense and sparse rewards. Scaling large return ranges down to the $[0, 1]$ interval, without amplifying near-zero returns, overcame this challenge. Using percentiles to ignore outliers in the return range further helped, especially for stochastic environments. We did not experience improvements from regularizing the policy towards its own EMA \citep{hilton2021ewmappo} or the CMPO regularizer \citep{hessel2021muesli}.
+\itempar{Unimix categoricals} We parameterize the categorical distributions for the world model representations and dynamics, as well as for the actor network, as mixtures of 1\% uniform and 99\% neural network output \citep{wiering1999unimix,gruslys2017reactor} to ensure a minimal amount of probability mass on every class and thus keep log probabilities and KL divergences well behaved.
+\itempar{Architecture} We use a similar network architecture but employ layer normalization \citep{ba2016layernorm} and SiLU \citep{hendrycks2016silu} as the activation function. For better framework support, we use same-padded convolutions with stride 2 and kernel size 3 instead of valid-padded convolutions with larger kernels. The robustness of DreamerV3 allowed us to use large networks that contributed to its performance.
+\itempar{Critic EMA regularizer} We compute $\lambda$-returns using the fast critic network and regularize the critic outputs towards those of its own weight EMA instead of computing returns using the slow critic. However, both approaches perform similarly in practice.
+\itempar{Replay buffer} DreamerV2 used a replay buffer that only replays time steps from completed episodes. To shorten the feedback loop, DreamerV3 uniformly samples from all inserted subsequences of size batch length regardless of episode boundaries.
+\itempar{Hyperparameters} The hyperparameters of DreamerV3 were tuned to perform well across both the visual control suite and Atari 200M at the same time. We verified their generality by training on new domains without further adjustment, including Crafter, BSuite, and Minecraft.
+\end{itemize}
+
+\subsection*{Target Regularizers}
+
+We also experimented with constrained optimization for the world model and policy objectives, where we set a target value that the regularizer should take on, on average across states.
+We found combining this approach with limits on the allowed regularizer scales to perform well for the world model, at the cost of additional complexity.
+For the actor, choosing a target randomness of $40\%$---where $0\%$ corresponds to the most deterministic and $100\%$ to the most random policy---learns robustly across domains but prevents the policy from converging to top scores in tasks that require speed or precision and slows down exploration under sparse rewards.
+The solutions in DreamerV3 do not have these issues intrinsic to constrained optimization formulations.
+
+\restoregeometry

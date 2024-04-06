@@ -1,0 +1,26 @@
+\newgeometry{top=1.5cm,bottom=2cm,left=2cm,right=2cm,footskip=14pt}
+
+\section{Ablation Explanation}
+
+\subsection*{World Model Ablations}
+
+\paragraph{NoFreeBits} Use KL balancing but no free bits, equivalent to setting the constants in \cref{eq:wm} from 1 to 0. This objective was used in DreamerV2 \citep{hafner2020dreamerv2}.
+\paragraph{NoKLBalance} Use free bits but no KL balancing by setting $\beta_{\mathrm{dyn}} = \beta_{\mathrm{dyn}} = 0.5$, which recovers the $\beta$-VAE objective \citep{higgins2016beta}. We found this value to perform well compared to nearby values. This objective was used in the first Dreamer agent \citep{hafner2019dreamer}.
+\paragraph{NoObsSymlog} This ablation removes the symlog encoding of inputs to the world model and also changes the symlog MSE loss in the decoder to a simple MSE loss. Because symlog encoding is only used for vector observations, this ablation is equivalent to DreamerV3 on purely image-based environments.
+\paragraph{TargetKL} Target a KL value of 3.5 nats on average over the replay buffer by increasing or decreasing the KL scale (both $\beta_{\mathrm{pred}}$ and $\beta_{\mathrm{rep}}$) by 10\% when the batch average of the KL value exceeds or falls below the tolerance of 10\% around the target value, similar to the KL-penalty variant of PPO \citep{schulman2017ppo}. The KL scale is limited to the range $[10^{-3}, 1.0]$ for numerical stability.
+
+\subsection*{Critic Ablations}
+
+\paragraph{RewardNorm} Instead of normalizing rewards, normalize rewards by dividing them by a running standard deviation and clipping them beyond a magnitude of 10.
+\paragraph{ContRegression} Using MSE symlog predictions for the reward and value heads.
+\paragraph{SqrtTransform} Using two-hot discrete regression with the asymmetric square root transformation introduced by R2D2 \citep{kapturowski2018r2d2} and used in MuZero \citep{schrittwieser2019muzero}.
+\paragraph{SlowTarget} Instead of using the fast critic for computing returns and training it towards the slow critic, use the slow critic for computing returns \citep{mnih2015dqn}.
+
+\subsection*{Actor Ablations}
+
+\paragraph{NoDenomMax} Normalize returns directly based on the range between percentiles 5 to 95 with a small epsilon in the denominator, instead of by the maximum of 1 and the percentile range. This way, not only large returns are scaled down but also small returns are scaled up.
+\paragraph{AdvantageStd} Advantage normalization as commonly used, for example in PPO \citep{schulman2017ppo} and Muesli \citep{hessel2021muesli}. However, scaling advantages without also scaling the entropy regularizer changes the trade-off between return and entropy in a way that depends on the scale of advantages, which in turn depends on how well the critic currently predicts the returns.
+\paragraph{ReturnStd} Instead of normalizing returns by the range between percentiles 5 to 95, normalize them by their standard deviation. When rewards are large but sparse, the standard deviation is small, scaling up the few large returns even further.
+\paragraph{TargetEntropy} Target a policy randomness of 40\% on average across imagined states by increasing or decreasing the entropy scale $\eta$ by 10\% when the batch average of the randomness falls below or exceeds the tolerance of 10\% around the target value. The entropy scale is limited to the range $[10^{-3}, 3\cdot10^{-2}]$. Policy randomness is the policy entropy mapped to range from 0\% (most deterministic allowed by action distribution parameterization) to 100\% (most uniform). Multiplicatively, instead of additively, adjusting the regularizer strength allows the scale to quickly move across orders of magnitude, outperforming the target entropy approach of SAC \citep{haarnoja2018sac} in practice. Moreover, targeting a randomness value rather than an entropy value allows sharing the hyperparameter across domains with discrete and continuous actions.
+
+\restoregeometry

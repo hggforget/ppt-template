@@ -1,0 +1,16 @@
+\section*{Previous Work}
+\label{sec:related}
+
+Developing general-purpose algorithms has long been a goal of reinforcement learning research.
+PPO \citep{schulman2017ppo} is one of the most widely used algorithms and requires relatively little tuning but uses large amounts of experience due to its on-policy nature.
+SAC \citep{haarnoja2018sac} is a popular choice for continuous control and leverages experience replay for higher data-efficiency, but in practice requires tuning, especially for its entropy scale, and struggles with high-dimensional inputs \citep{yarats2019sacae}.
+MuZero \citep{schrittwieser2019muzero} plans using a value prediction model and has achieved high performance at the cost of complex algorithmic components, such as MCTS with UCB exploration and prioritized replay.
+Gato \citep{reed2022gato} fits one large model to expert demonstrations of multiple tasks, but is only applicable to tasks where expert data is available.
+In comparison, we show that DreamerV3 masters a diverse range of environments trained with fixed hyperparameters and from scratch.
+
+Minecraft has been a focus of recent reinforcement learning research. With MALMO \citep{johnson2016malmo}, Microsoft released a free version of the popular game for research purposes.
+MineRL \citep{guss2019minerl} offers several competition environments, which we rely on as the basis for our experiments.
+MineDojo \citep{fan2022minedojo} provides a large catalog of tasks with sparse rewards and language descriptions.
+The yearly MineRL competition supports agents in exploring and learning meaningful skills through a diverse human dataset \citep{guss2019minerl}.
+VPT \citep{baker2022vpt} trained an agent to play Minecraft through behavioral cloning of expert data collected by contractors and finetuning using reinforcement learning, resulting in a 2.5\% success rate of diamonds using 720 V100 GPUs for 9 days.
+In comparison, DreamerV3 learns to collect diamonds in 17 GPU days from sparse rewards and without human data.

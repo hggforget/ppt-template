@@ -1,0 +1,57 @@
+\documentclass[12pt]{article}
+\input{commands}
+
+\title{\vspace*{-2.5ex}\bfseries Mastering Diverse Domains through World Models}
+
+\date{}
+\author{
+Danijar Hafner\rlap{,}\textsuperscript{12}\enskip
+Jurgis Pasukonis\rlap{,}\textsuperscript{1}\enskip
+Jimmy Ba\rlap{,}\textsuperscript{2}\enskip
+Timothy Lillicrap\textsuperscript{1}
+\\[1.5ex]\small{
+\textsuperscript{1}DeepMind\quad
+\textsuperscript{2}University of Toronto
+}}
+
+\begin{document}
+\pagestyle{fancy}
+
+\maketitle
+\thispagestyle{first}
+
+\begin{center}\bfseries
+\vspace{-.5ex}
+Abstract
+\vspace{-.2ex}
+\end{center}
+\begin{adjustwidth}{1cm}{1cm}
+\begin{hyphenrules}{nohyphenation}
+\ignorespaces
+\input{sections/abstract}
+\end{hyphenrules}
+\end{adjustwidth}
+
+\vfill
+\input{figures/summary/figure}
+\vfill
+\clearpage
+
+\input{sections/intro}
+\input{sections/method}
+\input{sections/experiments}
+\input{sections/related}
+\input{sections/discussion}
+
+\clearpage
+\begin{hyphenrules}{nohyphenation}
+\setlength{\bibsep}{.5ex plus .8ex}
+\bibliography{references}
+\end{hyphenrules}
+\clearpage
+\appendix
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+\input{sections/appendix}
+
+\end{document}

@@ -1,0 +1,24 @@
+\begin{table}[h!]
+\centering
+\begin{mytabular}{
+  colspec = {| L{6em} | C{3.5em} C{3.5em} C{3.5em} C{3.5em} C{3.5em} C{3.5em} C{3.5em} |},
+  row{1} = {font=\bfseries},
+}
+
+\toprule
+\newline Benchmark & \newline Tasks & Env Steps & Action Repeat & Env \llap{I}nstances & Train Ratio & GPU Days & Model Size \\
+\midrule
+DMC Proprio & 18 & 500K & 2 &  4 &  512 & \o\llap{<}1 & S \\
+DMC Vision  & 20 &   1M & 2 &  4 &  512 & \o\llap{<}1 & S \\
+Crafter     &  1 &   1M & 1 &  1 &  512 &         \o2 & XL \\
+BSuite      & 23 &  --- & 1 &  1 & 1024 & \o\llap{<}1 & XL \\
+Atari 100K  & 26 & 400K & 4 &  1 & 1024 & \o\llap{<}1 & S \\
+Atari 200M  & 55 & 200M & 4 &  8 &   64 &          16 & XL \\
+DMLab       &  8 &  50M & 4 &  8 &   64 &         \o4 & XL \\
+Minecraft   &  1 & 100M & 1 & 16 &   16 &          17 & XL \\
+\bottomrule
+
+\end{mytabular}
+\caption{Benchmark overview. The train ratio is the number of replayed steps per policy steps rather than environment steps, and thus unaware of the action repeat. BSuite sets the number of episodes rather than env steps, both of which vary across tasks. BSuite requires multiple configurations per environment and one seed per configuration, resulting in 468 runs. For DMC, the proprioceptive benchmark excludes the quadruped tasks that are present in the visual benchmark because of baseline availability in prior work. All agents were trained on 1 Nvidia V100 GPU each.}
+\label{tab:benchmarks}
+\end{table}

@@ -1,0 +1,39 @@
+\begin{table*}[h!]
+\centering
+\begin{mytabular}{
+  colspec = {| L{12em} | C{4em} C{4em} C{4em} C{4em} C{5em} |},
+  row{1} = {font=\bfseries},
+}
+
+\toprule
+Task & DDPG & MPO & DMPO & D4PG & DreamerV3 \\
+\midrule
+Environment Steps & 500K & 500K & 500K & 500K & 500K \\
+\midrule
+Acrobot Swingup & \o92.7 & \o80.6 & \o98.5 & 125.5 & \textbf{154.5} \\
+Cartpole Balance & \textbf{996.2} & \textbf{958.4} & \textbf{998.5} & \textbf{998.8} & \textbf{990.5} \\
+Cartpole Balance Sparse & \textbf{985.3} & \textbf{998.0} & \textbf{994.0} & \textbf{979.6} & \textbf{996.8} \\
+Cartpole Swingup & \textbf{863.9} & \textbf{857.7} & \textbf{857.8} & \textbf{874.6} & \textbf{850.0} \\
+Cartpole Swingup Sparse & 627.5 & 519.9 & 404.0 & \textbf{739.6} & 468.1 \\
+Cheetah Run & 576.9 & \textbf{612.3} & 581.6 & \textbf{623.5} & 575.9 \\
+Cup Catch & 905.5 & 800.6 & \textbf{965.8} & \textbf{968.3} & \textbf{958.2} \\
+Finger Spin & 753.6 & 766.9 & 744.3 & 818.4 & \textbf{937.2} \\
+Finger Turn Easy & 462.2 & 430.4 & 593.8 & 524.5 & \textbf{745.4} \\
+Finger Turn Hard & 286.3 & 250.8 & 384.5 & 379.2 & \textbf{841.0} \\
+Hopper Hop & \o24.6 & \o37.5 & \o71.5 & \o67.5 & \textbf{111.0} \\
+Hopper Stand & 388.1 & 279.3 & 519.5 & \textbf{755.4} & 573.2 \\
+Pendulum Swingup & 748.3 & \textbf{829.8} & \textbf{829.5} & 756.0 & 766.0 \\
+Reacher Easy & \textbf{921.8} & \textbf{954.4} & \textbf{965.1} & \textbf{941.5} & \textbf{947.1} \\
+Reacher Hard & \textbf{944.2} & \textbf{914.1} & \textbf{956.8} & \textbf{932.0} & \textbf{936.2} \\
+Walker Run & 530.0 & 539.5 & 462.9 & 593.1 & \textbf{632.7} \\
+Walker Stand & \textbf{967.4} & \textbf{960.4} & \textbf{971.6} & \textbf{935.2} & \textbf{956.9} \\
+Walker Walk & \textbf{948.7} & \textbf{924.9} & \textbf{933.1} & \textbf{965.1} & \textbf{935.7} \\
+\midrule
+Median & 751.0 & 783.7 & 786.9 & 787.2 & \textbf{845.5} \\
+Mean & 667.9 & 650.9 & 685.2 & 721.0 & \textbf{743.1} \\
+\bottomrule
+
+\end{mytabular}
+\caption{DMC scores for proprioceptive inputs at 500K frames.}
+\label{tab:dmc_proprio}
+\end{table*}
