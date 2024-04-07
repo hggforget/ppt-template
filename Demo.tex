@@ -154,11 +154,11 @@
   \frametitle{World Model}
    \begin{figure}
 \begin{subfigure}{.5\textwidth}
-\includegraphics[width=0.75\linewidth]{SafeDreamer/images/model_wm.pdf}
+\includegraphics[width=0.75\linewidth]{images/model_wm.pdf}
 \caption{World Model Learning}
 \end{subfigure}
 \begin{subfigure}{.43\textwidth}
-\includegraphics[width=0.75\linewidth]{SafeDreamer/images/model_ac.pdf}
+\includegraphics[width=0.75\linewidth]{images/model_ac.pdf}
 \caption{Actor Critic Learning}
 \end{subfigure}
 \label{fig:model}
@@ -170,8 +170,8 @@
 \item \textbf{处理观察和动作}：在每个时间步骤$t$，世界模型接收一个观察$o_t$和一个动作$a_t$，并将观察压缩为一个离散的表示$z_t$。
 \item \textbf{预测任务}：这个离散的表示$z_t$，连同动作，被序列模型用来预测下一个表示$\hat{z}_{t+1}$。
 \item \textbf{模型状态的定义}：模型状态$s_t=\{h_t, z_t\}$由一个循环状态$h_t$和表示$z_t$的联接表示。
-\item \textbf{解码器的作用}：解码器利用模型状态$s_t$预测观察，奖励和成本。
-\item \textbf{行动者-评论者模型的输入}：模型状态$s_t$充当行动者-评论者模型的输入，以预测奖励值$v_{r_t}$，成本值$v_{c_t}$和动作$a_t$。
+\item \textbf{解码器的作用}：解码器利用模型状态$s_t$预测观察，奖励和代价。
+\item \textbf{行动者-评论者模型的输入}：模型状态$s_t$充当行动者-评论者模型的输入，以预测奖励值$v_{r_t}$，代价值$v_{c_t}$和动作$a_t$。
 \end{itemize}
 }
 \end{frame}
@@ -200,7 +200,7 @@
 
 \begin{frame}[t, fragile]
 	\frametitle{CCEM}
- Constrained Cross-Entropy Method 是一种应用于安全强化学习问题的方法。该方法特点在于，它会显式地跟踪其在满足约束方面的表现。特别是，该方法在有限长度的轨道上定义约束，这是以预期的成本形式表示的。
+ Constrained Cross-Entropy Method 是一种应用于安全强化学习问题的方法。该方法特点在于，它会显式地跟踪其在满足约束方面的表现。特别是，该方法在有限长度的轨道上定义约束，这是以预期的代价形式表示的。
 	\begin{algorithm}[H]
 	\SetAlgoLined
 	\KwIn{Initial parameters $\theta_0$, initial Lagrange multipliers $\lambda_0$}
@@ -230,12 +230,12 @@
 		{
 		\fontsize{10}\selectfont
 		\begin{itemize}
-			\item OSPR:每个决策时间点t都会进行在线规划过程,
-			该过程会在世界模型中从当前状态st生成状态-动作轨迹。
-			每个轨迹都会通过学习到的奖励和成本模型以及它们的评价者进行评估，
+			\item\textbf{OSPR:} 每个决策时间点$t$都会进行在线规划过程,
+			该过程会在世界模型中从当前状态$s_{t}$生成状态-动作轨迹。
+			每个轨迹都会通过学习到的奖励和代价模型以及它们的评价者进行评估，
 			从中选出最优的安全动作轨迹在环境中执行。
-			\item BSPR:在执行者训练期间，
-			我们在后台的世界模型中产生长度为T=15的想象的潜在回滚。
+			\item\textbf{BSPR:} 在执行者训练期间，
+			我们在后台的世界模型中产生长度为$T$=15的想象的隐层表征。
 			我们从重播缓冲区的观察开始，从执行者中采样动作，
 			并从世界模型中获取观察结果。
 		\end{itemize}
@@ -243,41 +243,129 @@
 	\end{spacing}
 \end{frame}
 
-\begin{frame}[t, fragile]
-	\frametitle{OSPR}
-	\begin{minipage}[t]{0.40\linewidth}
-	OSPR在进行轨迹采样的每一步中,会使用Planner生成Action.
-	\end{minipage}\hfill
-	\begin{minipage}[t]{0.60\linewidth}
-	\begin{algorithm}[H]
-	\SetAlCapNameFnt{\fontsize{8pt}{9.6pt}\selectfont} 
-	\SetAlCapFnt{\fontsize{8pt}{9.6pt}\selectfont}
-	\fontsize{8pt}{9.6pt}\selectfont
-	\DontPrintSemicolon
-	\SetNoFillComment
-	\SetAlgoLined
-	\textbf{Input:} current model state $s_{t}$, planning horizon $H$,\\
-	num sample/policy/safe trajectories $N_{\pi_\mathcal{N}}, N_{\pi_\theta}, N_{s}$,\\
-	Lagrangian multiplier $\lambda_p$, cost limit $b$, $\mu^{0}, \sigma^{0}$ for $\mathcal{N}$\\
-	\For{$j \gets 1 $ \KwTo J}{
-	   Init. empty safe/candidate/elite actions set $A_s, A_c, A_e$\\
-	   Sample $N_{\pi_{\mathcal{N}}}+N_{\pi_\theta}$ traj. $\{ s_{i}, a_{i}, s_{i+1}\}_{i=t}^{t+H}$ using $\mathcal{N}(\mu^{j-1}, (\sigma^{j-1})^{2}\mathrm{I})$, $\pi_{\theta}$ within $S_{\phi}$ with  $s_t$ as the initial state\\
-	   Select the top-k action trajectories with highest $\Omega$ values among $A_c$ as elite actions $A_e$\\
-	   $\mu^j, \sigma^j = \mathrm{MEAN}\left(A_e\right), \mathrm{STD}\left(A_e\right)$ 
-	}
-	\textbf{Return: } $a \sim \mathcal{N}(\mu^{J}, (\sigma^{J})^{2} \mathrm{I})$
-	\caption{Online Safety-Reward Planning.}
-	\label{alg:planning}
-	\end{algorithm}
-	\end{minipage}
-	\end{frame}
+% \begin{frame}[t, fragile]
+% 	\frametitle{OSPR}
+% 	\begin{minipage}[t]{0.40\linewidth}
+%  {
+%  \fontsize{6pt}{7.2pt}\selectfont
+% 	定义与概述\begin{itemize}\item 我们引入了在线安全奖励规划 (OSRP)，在世界模型中从当前状态生成状态-动作路径，通过学习的奖励和代价模型进行评估。\end{itemize}
+% 所采用的方法\begin{itemize}\item 我们采用约束交叉熵方法 (CCEM) 进行规划，初始化一个覆盖规划时域长度的动作均值和标准差序列。\end{itemize}
+% 计算过程\begin{itemize}\item 我们使用当前动作分布在世界模型中采样状态路径，并估算每个路径的奖励返回和代价返回。\item 使用代价模型计算一定步数内的总代价。\end{itemize}
+% 评估与选择\begin{itemize}\item 我们设定一个轨迹满足代价阈值的准则，并期望得到安全的轨迹。\item 如果安全轨迹的数量小于期望值，我们将采样的动作轨迹全集作为候选动作集；否则，将安全动作轨迹集作为候选动作集。\end{itemize}
+% 结果处理\begin{itemize}\item 我们选择排序键值最高的前几个动作轨迹作为精英动作。\item 得到一组新的参数，并在规划过程中使用。\item 从最终分布中采样一个动作轨迹，然后在真实环境中执行这个轨迹的第一个动作。\end{itemize}
+% }
+% 	\end{minipage}\hfill
+% 	\begin{minipage}[t]{0.60\linewidth}
+% 	\begin{algorithm}[H]
+% 	\SetAlCapNameFnt{\fontsize{8pt}{9.6pt}\selectfont} 
+% 	\SetAlCapFnt{\fontsize{8pt}{9.6pt}\selectfont}
+% 	\fontsize{8pt}{9.6pt}\selectfont
+% 	\DontPrintSemicolon
+% 	\SetNoFillComment
+% 	\SetAlgoLined
+% 	\textbf{Input:} current model state $s_{t}$, planning horizon $H$,\\
+% 	num sample/policy/safe trajectories $N_{\pi_\mathcal{N}}, N_{\pi_\theta}, N_{s}$,\\
+% 	Lagrangian multiplier $\lambda_p$, cost limit $b$, $\mu^{0}, \sigma^{0}$ for $\mathcal{N}$\\
+% 	\For{$j \gets 1 $ \KwTo J}{
+% 	   Init. empty safe/candidate/elite actions set $A_s, A_c, A_e$\\
+% 	   Sample $N_{\pi_{\mathcal{N}}}+N_{\pi_\theta}$ traj. $\{ s_{i}, a_{i}, s_{i+1}\}_{i=t}^{t+H}$ using $\mathcal{N}(\mu^{j-1}, (\sigma^{j-1})^{2}\mathrm{I})$, $\pi_{\theta}$ within $S_{\phi}$ with  $s_t$ as the initial state\\
+% 	   Select the top-k action trajectories with highest $\Omega$ values among $A_c$ as elite actions $A_e$\\
+% 	   $\mu^j, \sigma^j = \mathrm{MEAN}\left(A_e\right), \mathrm{STD}\left(A_e\right)$ 
+% 	}
+% 	\textbf{Return: } $a \sim \mathcal{N}(\mu^{J}, (\sigma^{J})^{2} \mathrm{I})$
+% 	\caption{Online Safety-Reward Planning.}
+% 	\label{alg:planning}
+% 	\end{algorithm}
+% 	\end{minipage}
+% 	\end{frame}
 
 \begin{frame}[t, fragile]
-	\frametitle{BSPR}
-	\begin{minipage}[t]{0.20\linewidth}
-	BSPR
-	\end{minipage}\hfill
-	\begin{minipage}[t]{0.80\linewidth}
+\frametitle{在线安全奖励规划 (OSPR)}
+\begin{columns}[c]
+\begin{column}{0.45\textwidth}
+
+\vspace{-1cm}
+
+{\fontsize{6pt}{7.2pt}\selectfont\textbf{定义与概述}
+\begin{itemize}
+\item 引入在线安全奖励规划 (OSRP)，在世界模型中生成状态-动作路径，并通过奖励和代价模型进行评估。
+\end{itemize}
+    \textbf{方法}\\
+    \begin{itemize}
+      \item 采用约束交叉熵方法(CCEM)进行规划，初始化一个动作均值和标准差序列。
+    \end{itemize}
+
+    \textbf{计算过程}\\
+    \begin{itemize}
+      \item 使用当前动作分布采样状态路径，并估算每个路径的奖励和代价返回。
+      \item 利用代价模型计算一定步数内的总代价。
+    \end{itemize}
+
+    \textbf{评估与选择}\\
+    \begin{itemize}
+      \item 设定轨迹满足代价阈值的准则，期望得到安全的轨迹。
+      \item 根据满足条件的轨迹数量，选择候选动作集。
+    \end{itemize}
+    
+    \textbf{结果处理}\\
+    \begin{itemize}
+      \item 选取排序键值最高的动作轨迹为精英动作。
+      \item 得到新的参数组并在规划过程中使用。
+      \item 从最终分布中采样动作轨迹，并执行此轨迹的第一个动作。
+    \end{itemize}
+  }
+\end{column}
+
+\begin{column}{0.55\textwidth}
+    \begin{spacing}{1.5}
+   
+    \begin{algorithm}[H]
+    \SetAlCapNameFnt{\fontsize{6pt}{8pt}\selectfont} 
+    \SetAlCapFnt{\fontsize{6pt}{8pt}\selectfont}
+    \fontsize{6pt}{8pt}\selectfont
+    \DontPrintSemicolon
+    \SetNoFillComment
+    \SetAlgoLined
+    \caption{在线安全奖励规划}
+    \textbf{输入}: 当前模型状态 $s_{t}$, 规划时域 $H$，轨迹样本数 $N_{\pi_\mathcal{N}}, N_{\pi_\theta}, N_{s}$，Lagrangian 乘数 $\lambda_p$，代价限制 $b$，初始 $\mu^{0}, \sigma^{0}$
+    
+    \For{$j \gets 1$ \KwTo $J$}{
+        初始化空的安全/候选/精英动作集 $A_s, A_c, A_e$\\
+        在模型中选择 $N_{\pi_{\mathcal{N}}}+N_{\pi_\theta}$ 个轨迹 $\{ s_{i}, a_{i}, s_{i+1}\}_{i=t}^{t+H}$ 使用 $\mathcal{N}(\mu^{j-1}, (\sigma^{j-1})^{2}\mathrm{I})$, $\pi_{\theta}$ 并设 $s_t$ 为起始状态\\
+        
+        计算并返回每条轨迹的代价以及满足阈值的轨迹集合($N_{\pi_{\mathcal{N}}}+N_{\pi_\theta}$ 轨迹集合, $\gamma$, $C_\phi$, $L$)\\
+        判断轨迹集合的大小，选择 $\Omega$ 并确定 $A_c$\\
+        从 $A_c$ 中选择 $\Omega$ 值最高的前k个动作轨迹作为精英动作 $A_e$\\
+         $\mu^j, \sigma^j = \mathrm{MEAN}\left(A_e\right), \mathrm{STD}\left(A_e\right)$\;
+    }
+   \textbf{Return: } $a \sim \mathcal{N}(\mu^{J}, (\sigma^{J})^{2} \mathrm{I})$
+	\label{alg:planning}
+	\end{algorithm}
+      
+    \end{spacing}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[t, fragile]
+	\frametitle{后台安全奖励规划 (BSRP)}
+ \begin{columns}[c]
+	\begin{column}[t]{0.40\linewidth}
+ {
+ \vspace{-4cm}
+ \begin{spacing}{1.3}
+ \fontsize{7pt}{8.4pt}\selectfont
+    \begin{itemize}
+    \item 使用 Lagrangian 方法进行后台安全奖励规划 (BSRP) 以训练安全 actor。 
+    \item 在 actor 训练期间，我们在后台世界模型中生成长度为 $T = 15$ 的假想潜在轨迹。
+    \item 我们从回放缓冲区开始观察，从 actor 中采样动作，并从世界模型中采样观察结果。世界模型还预测了奖励和代价，从中我们计算 TD($\lambda$) 值 $R^\lambda(s_t)$ 和 $C^\lambda(s_t)$。
+    \item 这些值被用于随机反向传播，以更新安全 actor。
+    \item 在此过程中的训练损失指导了安全 actor 去最大化期望回报和熵，同时最小化代价回报，利用了增强的拉格朗日方法。
+    \end{itemize}
+     \end{spacing}
+}
+	\end{column}
+	\begin{column}[t]{0.60\linewidth}
 	\begin{algorithm}[H]
 	\SetAlCapNameFnt{\fontsize{6pt}{7.2pt}\selectfont} 
 	\SetAlCapFnt{\fontsize{6pt}{7.2pt}\selectfont}
@@ -285,37 +373,38 @@
 	\DontPrintSemicolon
 	\SetNoFillComment
 	\SetAlgoLined
-	\KwIn{batch length $T$, batch size $B$, episode length $L$, initial Lagrangian multiplier $\lambda_p$}
-Initialize the world models parameters $\phi$, actor-critic parameters $\theta, V_{\psi_r}, V_{\psi_c}$ \;
-Initialize dataset $\mathcal{D}$ using a random policy\;
-\While{\emph{not converged}}{
-  Sample $B$ trajectories $\{ o_{t}, a_{t}, o_{t+1}, r_{t+1}, c_{t+1}\}_{t:t+T} \sim \mathcal{D}$ \;
-  Update the world models via minimize Equation \eqref{eq:world_model_loss} \;
-  Condense $o_{t:t+T}$ into $s_{t: t+T}$ via world models\;
-Generate latent rollouts using the actor within the world model with $s_{t: t+T}$ as the initial state\;
-  Update the reward and cost critics via minimize Equation \eqref{eq:reward_critic_loss}\;
-  \newDream{Update the safe actor and $\lambda_p$ via Equation \eqref{eq:safe_actor_loss} and Equation \eqref{eq:lag}} \tcp*{Only BSRP-Lag}
+\KwIn{批长度 $T$, 批大小 $B$, 事件长度 $L$, 初始拉格朗日乘数 $\lambda_p$}
+初始化世界模型参数 $\phi$, 演员-评论家参数 $\theta, V_{\psi_r}, V_{\psi_c}$ \;
+用随机策略初始化数据集 $\mathcal{D}$\;
+\While{\emph{未收敛}}{
+  从 $\mathcal{D}$ 中采样 $B$ 条轨迹 $\{ o_{t}, a_{t}, o_{t+1}, r_{t+1}, c_{t+1}\}_{t:t+T}$ \;
+  更新世界模型 \;
+  将 $o_{t:t+T}$ 通过世界模型压缩成 $s_{t: t+T}$\;
+使用演员在世界模型中生成潜在漫步，以 $s_{t: t+T}$ 为初始状态\;
+  更新奖励和代价评论家\;
+  \newDream{更新安全演员和 $\lambda_p$} \tcp*{仅限 BSRP}
   $\mathcal{J}_{\mathcal{C}} \leftarrow 0$\;
   \For{$t = 1$ to $L$}{
-    Condense $o_t$ into latent state via ${s}_t \sim S_\phi(o_t, s_{t-1}, a_{t-1})$\;
-    \newDream{Sample $a_t \sim \pi_a(\cdot | s_t)$}\tcp*{Only BSRP-Lag}
-    \newpid{Sample $a_t \sim Planner(s_t, \lambda_p)$}\tcp*{Only OSRP-Lag or OSRP}
-    Execute action $a_t$, observe $o_{t + 1},r_{t+1}, c_{t+1}$ returned from the environment\;
-    Update dataset $\mathcal{D} \leftarrow \mathcal{D} \cup\left\{o_{t}, a_{t}, o_{t+1}, r_{t+1}, c_{t+1}\right\}$\;
+    通过 ${s}_t \sim S_\phi(o_t, s_{t-1}, a_{t-1})$ 将 $o_t$ 压缩成潜在状态\;
+    \newDream{采样 $a_t \sim \pi_a(\cdot | s_t)$}\tcp*{仅限 BSRP}
+    \newpid{采样 $a_t \sim Planner(s_t, \lambda_p)$}\tcp*{仅限 OSRP}
+    执行动作 $a_t$, 观察环境返回的 $o_{t + 1},r_{t+1}, c_{t+1}$\;
+    更新数据集 $\mathcal{D} \leftarrow \mathcal{D} \cup\left\{o_{t}, a_{t}, o_{t+1}, r_{t+1}, c_{t+1}\right\}$\;
     $\mathcal{J}_{\mathcal{C}} \leftarrow \mathcal{J}_{\mathcal{C}} + c_{t+1}$\;
   }
-  \newpid{Use $\mathcal{J}_{\mathcal{C}}$ to update $\lambda_p$ via Algorithm \ref{alg: pid_lag}}\tcp*{Only OSRP-Lag}
+  \newpid{用 $\mathcal{J}_{\mathcal{C}}$ 更新 $\lambda_p$}\tcp*{仅限 OSR}
 }
-\caption{~~SafeDreamer. Color \newpid{green is OSRP-Lag or OSRP}, \newDream{purple is BSRP-Lag}}
+\caption{~~SafeDreamer. \newpid{绿色是 OSRP}, \newDream{紫色是 BSRP}}
 \label{alg: train_model_ac}
 	\end{algorithm}
-	\end{minipage}
-
+	\end{column}
+\end{columns}
 \end{frame}
 
 \section{Safety-Gymnasium}
 
 \subsection{intro}
+
 \begin{frame}[t, fragile]
 \frametitle{Safety-Gymnasium}
 
@@ -325,13 +414,14 @@ Generate latent rollouts using the actor within the world model with $s_{t: t+T}
    \vspace{0.3cm}
    
    \textbf{主要组成部分:}
-   \vspace{0.2cm}
 
-\begin{enumerate*}{inline=True}
-    \item 智能体模型, and-
-    \item 安全任务
-    \item 安全约束
-\end{enumerate*}
+   
+   \vspace{0.2cm}
+   \hspace*{0.2cm} 
+   (1) 智能体模型 \hspace*{1cm} 
+   (2) 安全任务 \hspace*{1cm} 
+   (3) 安全约束
+   \hfill
 \end{minipage}
 
 % \begin{minipage}[t]{\textwidth}
@@ -370,7 +460,7 @@ Generate latent rollouts using the actor within the world model with $s_{t: t+T}
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.95\textwidth]{SafeDreamer/images/task.pdf}
+  \includegraphics[width=0.95\textwidth]{images/task.pdf}
   \vspace*{-0.8\baselineskip}
   \caption{Tasks from Safety-Gymnasium.}
   \label{fig:task}
@@ -385,7 +475,6 @@ Generate latent rollouts using the actor within the world model with $s_{t: t+T}
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.9\linewidth]{Safety-Gymnasium/assets/main-paper/agent.pdf}
-  \vspace*{-0.5\baselineskip}
   \setbeamerfont{caption}{size=\tiny}
   \caption{\textbf{Upper: }The Single-Agent Robots. \textbf{Lower:} The Multi-Agent Robots.}
   \label{pic:agent}
