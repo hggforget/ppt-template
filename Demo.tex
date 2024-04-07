@@ -106,7 +106,7 @@
 
 \section{RL算法}
 
-\subsection{intro}
+\subsection{Intro}
 
 \begin{frame}[t, fragile]
 	\frametitle{SafeDreamer Algorithm}
@@ -124,12 +124,12 @@
 	\end{spacing}
 \end{frame}
 
-\subsection{Planning process}
+\subsection{Planning Process}
 \begin{frame}[t,fragile]
     \frametitle{Planning process}
     \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.8\textwidth]{images/architecture.pdf}
+  \includegraphics[width=0.8\textwidth]{SafeDreamer/images/architecture.pdf}
   \caption{Safety-reward planning process.}
   \label{fig:architecture}
 \end{figure}
@@ -431,7 +431,7 @@
 
 \section{Safety-Gymnasium}
 
-\subsection{intro}
+\subsection{Intro}
 
 \begin{frame}[t, fragile]
 \frametitle{Safety-Gymnasium}
@@ -572,7 +572,7 @@
 
 
 
-\subsection{Vision-only tasks}
+\subsection{Vision-only Tasks}
 \begin{frame}[t,fragile]
     \frametitle{Vision-only tasks}
 \begin{figure}[ht]
@@ -628,5 +628,50 @@ Safety Gymnasium的改进：
 
 \end{frame}
 
+\section{Project Progress}
+
+\subsection{Problem Statement}
+
+\begin{frame}[t, fragile]
+    \frametitle{Problem Statement}
+    \begin{spacing}{1.5}
+		无人机智能避障与导航项目仿真环境要求:
+		\begin{itemize}
+	      \item \textbf{模型库:} 提供模拟无人系统的智能体模型。
+            \item \textbf{传感器模型:} 支持IMU,定位系统等传感器的数据输入。
+            \item \textbf{仿真验证:} 支持决策、控制相关算法的仿真验证，包括:无人系统导航、自主避障、路径规划、强化学习、决策推理等。
+		\end{itemize}
+        无人机智能避障与导航项目算法难点:
+		\begin{itemize}
+	      \item \textbf{传感器数据感知模型:} 支持IMU,定位系统等传感器数据的特征嵌入。
+            \item \textbf{世界模型支持空气动力学等物理属性:} 世界模型不再是vision-only,而能够感知事物间内在的物理联系。
+            \item \textbf{三维空间导航与避障:} SafeDreamer的Agent主要是在地面移动,而无人机在天空, 动作集维度增多, 训练难度增大。
+		\end{itemize}
+    \end{spacing}
+   
+\end{frame}
+
+\subsection{Survey}
+
+\begin{frame}[t, fragile]
+    \frametitle{仿真环境调研}
+    \begin{spacing}{1.5}
+		gym-pybullet-drones:
+		\begin{itemize}
+	      \item \textbf{模型库:} 提供无人机的智能体模型。
+            \item \textbf{传感器模型:} 支持IMU,定位系统等传感器。
+            \item \textbf{空气动力学系统:} 支持空气动力学系统。
+            \item \textbf{高度感知的视觉输入:} gym-pybullet-drones的视觉输出中自带高度差异，而非平面。
+		\end{itemize}
+        Safety-Gymnasium:
+		\begin{itemize}
+             \item \textbf{安全约束:} Safety-Gymnasium对安全约束具有原生支持，提供了安全约束显示等功能。
+             \item \textbf{代码兼容性:} SafeDreamer使用Safety-Gymnasium进行仿真，所以代码兼容性良好。
+		\end{itemize}
+    \end{spacing}
+   
+\end{frame}
+    
+    
 
 \end{document} 
