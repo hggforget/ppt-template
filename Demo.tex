@@ -105,6 +105,9 @@
 \end{frame}
 
 \section{RL算法}
+
+\subsection{intro}
+
 \begin{frame}[t, fragile]
 	\frametitle{SafeDreamer Algorithm}
 	% \setlength{\parindent}{2em}
@@ -120,6 +123,32 @@
 		\end{itemize}
 	\end{spacing}
 \end{frame}
+
+\subsection{Planning process}
+\begin{frame}[t,fragile]
+    \frametitle{Planning process}
+    \begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.8\textwidth]{images/architecture.pdf}
+  \caption{Safety-reward planning process.}
+  \label{fig:architecture}
+\end{figure}
+\vspace{-0.5cm}
+\begin{spacing}{1.2}
+
+\begin{enumerate}
+\item 智能体从环境中获取观察。
+\item 利用编码器将观察结果提炼为潜在状态$s_1$。
+\item 智能体根据策略生成动作轨迹。
+\item 在世界模型中执行这些动作，预测潜在的模型状态以及每个潜在状态下的奖励、代价、价值和代价价值。
+\item 使用TD($\lambda$)方法来估计每个轨迹的回报和代价回报。
+\item 利用这些估计值来更新策略。
+\end{enumerate}
+    
+\end{spacing}
+
+\end{frame}
+
 
 \subsection{Model Components}
 
@@ -149,16 +178,15 @@
 \end{frame}
 
 \subsection{Preliminaries}
-\subsubsection{Dreamer}
 \begin{frame}[t, fragile]
   \frametitle{World Model}
    \begin{figure}
 \begin{subfigure}{.5\textwidth}
-\includegraphics[width=0.75\linewidth]{images/model_wm.pdf}
+\includegraphics[width=0.75\linewidth]{SafeDreamer/images/model_wm.pdf}
 \caption{World Model Learning}
 \end{subfigure}
 \begin{subfigure}{.43\textwidth}
-\includegraphics[width=0.75\linewidth]{images/model_ac.pdf}
+\includegraphics[width=0.75\linewidth]{SafeDreamer/images/model_ac.pdf}
 \caption{Actor Critic Learning}
 \end{subfigure}
 \label{fig:model}
@@ -460,7 +488,7 @@
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.95\textwidth]{images/task.pdf}
+  \includegraphics[width=0.95\textwidth]{SafeDreamer/images/task.pdf}
   \vspace*{-0.8\baselineskip}
   \caption{Tasks from Safety-Gymnasium.}
   \label{fig:task}
